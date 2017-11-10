@@ -83,41 +83,56 @@ void RPCTypeCheck(const Object& o,
 
 uint64_t AmountFromValue(const Value& value)
 {
-    if (value.type() != str_type)
-    	throw JSONRPCError(RPC_TYPE_ERROR, "Invalid amount, not string");
+	if (value.type() != str_type)
+		throw JSONRPCError(RPC_TYPE_ERROR, "Invalid amount, not string");
 
-    const char *str = value.get_str().c_str();
+	const char *str = value.get_str().c_str();
 
-    int end = strlen(str);
-    if(end < 14)
-	throw JSONRPCError(RPC_TYPE_ERROR, "Invalid amount, too short");
+	if (fEPAmounts) {
+		int end = strlen(str);
+		if(end < 14)
+		throw JSONRPCError(RPC_TYPE_ERROR, "Invalid amount, too short");
 
-    if(str[end-2] != 'e' || str[end-1] != 'p')
-	throw JSONRPCError(RPC_TYPE_ERROR, "Invalid amount, no ep");
+		if(str[end-2] != 'e' || str[end-1] != 'p')
+		throw JSONRPCError(RPC_TYPE_ERROR, "Invalid amount, no ep");
 
-    uint64_t v=0;	
-    int i;	
-    for(i=0; i < end-2; i++){
-	char c = str[i];
-	if(i==end-13){
-	    if(c == '.')
-		continue;
-	    //error
-	    throw JSONRPCError(RPC_TYPE_ERROR, "Invalid amount, decimal missing");
+		uint64_t v=0;
+		int i;
+		for(i=0; i < end-2; i++){
+		char c = str[i];
+		if(i==end-13){
+			if(c == '.')
+				continue;
+					//error
+					throw JSONRPCError(RPC_TYPE_ERROR, "Invalid amount, decimal missing");
+			}
+			if(c < '0' || c > '9'){
+				//error
+				throw JSONRPCError(RPC_TYPE_ERROR, "Invalid amount, unknown char");
+			}
+			uint64_t nv = v * 10 + (c - '0');
+			if(nv<v)
+				throw JSONRPCError(RPC_TYPE_ERROR, "Invalid amount, overflow");
+			v = nv;
+		}
+
+		if (v > MAX_MONEY)
+			throw JSONRPCError(RPC_TYPE_ERROR, "Invalid amount, too large");
+		return v;
+	} else {
+		char buf[64] = {0};
+		strncpy(buf, str, 52);
+		char *pos = strchr(buf, '.');
+		if (pos) {
+			*pos++ = 0;
+			char *tmp = pos + 10;
+			*tmp-- = 0;
+			while (*tmp == 0) *tmp-- = '0';
+			return strtoull(buf, NULL, 10) * COIN + strtoull(pos, NULL, 10);
+		} else {
+			return strtoull(buf, NULL, 10) * COIN;
+		}
 	}
-	if(c < '0' || c > '9'){
-	    //error
-	    throw JSONRPCError(RPC_TYPE_ERROR, "Invalid amount, unknown char");
-	}
-	uint64_t nv = v * 10 + (c - '0');
-	if(nv<v)
-		throw JSONRPCError(RPC_TYPE_ERROR, "Invalid amount, overflow");
-	v = nv;
-    }
-
-    if (v > MAX_MONEY)
-        throw JSONRPCError(RPC_TYPE_ERROR, "Invalid amount, too large");
-    return v;
 }
 
 Value ValueFromAmount(uint64_t v)
@@ -131,14 +146,17 @@ Value ValueFromAmount(uint64_t v)
 
     int i;
     for(i=0; i < ceil(log10(COIN)); i++){
-	fraction *= 10;
-	buf[idx++] = '0' + (fraction/COIN);
-	fraction -= (fraction/COIN)*COIN;
-    }
+			fraction *= 10;
+			buf[idx++] = '0' + (fraction/COIN);
+			fraction -= (fraction/COIN)*COIN;
+		}
+	if (fEPAmounts) {
     buf[idx++] = 'e';
     buf[idx++] = 'p';
+	}
     buf[idx++] = 0;
-    return string(buf);
+//		snprintf(buf, 63, "%lu", v);
+  return string(buf);
 }
 
 std::string HexBits(unsigned int nBits)
