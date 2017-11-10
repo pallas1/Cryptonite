@@ -37,7 +37,7 @@ class uint256;
 
 static const uint64_t COIN = 10000000000;
 static const uint64_t CENT = 100000000;
-static const uint64_t COINS = UINT64_MAX/COIN;	
+static const uint64_t COINS = UINT64_MAX/COIN;
 
 extern std::string strCommandLine;
 
@@ -118,6 +118,7 @@ extern std::string strMiscWarning;
 extern bool fNoListen;
 extern bool fLogTimestamps;
 extern volatile bool fReopenDebugLog;
+extern bool fEPAmounts;
 
 void RandAddSeed();
 void RandAddSeedPerfmon();
