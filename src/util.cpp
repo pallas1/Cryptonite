@@ -96,6 +96,7 @@ bool fNoListen = false;
 bool fLogTimestamps = false;
 volatile bool fReopenDebugLog = false;
 CClientUIInterface uiInterface;
+bool fEPAmounts = true;
 
 // Init OpenSSL library multithreading support
 static CCriticalSection** ppmutexOpenSSL;
@@ -478,7 +479,7 @@ static void InterpretNegativeSetting(string name, map<string, string>& mapSettin
 std::string strCommandLine;
 
 void ParseParameters(int argc, const char* const argv[])
-{   
+{
     for(int i=0; i < argc; i++)
     	strCommandLine += std::string(argv[i]) + " ";
 
