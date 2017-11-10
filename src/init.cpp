@@ -179,7 +179,7 @@ void HandleSIGABORT(int sig)
     backtrace();
     exit(1);
 }
-#endif 
+#endif
 
 bool static InitError(const std::string &str)
 {
@@ -338,6 +338,7 @@ std::string HelpMessage(HelpMessageMode hmm)
     strUsage += "  -rpcport=<port>        " + _("Listen for JSON-RPC connections on <port> (default: 8252 or testnet: 18252)") + "\n";
     strUsage += "  -rpcallowip=<ip>       " + _("Allow JSON-RPC connections from specified IP address") + "\n";
     strUsage += "  -rpcthreads=<n>        " + _("Set the number of threads to service RPC calls (default: 4)") + "\n";
+    strUsage += "  -epamounts=<n>         " + _("Use Extended Precision amounts in RPC calls (default: 1, 0 to disable)") + "\n";
 
     strUsage += "\n" + _("RPC SSL options: (see the Cryptonite Wiki for SSL setup instructions)") + "\n";
     strUsage += "  -rpcssl                                  " + _("Use OpenSSL (https) for JSON-RPC connections") + "\n";
@@ -548,6 +549,10 @@ bool AppInit2(boost::thread_group& threadGroup)
         nMaxConnections = nFD - MIN_CORE_FILEDESCRIPTORS;
 
     // ********************************************************* Step 3: parameter-to-internal-flags
+
+    fEPAmounts = (GetArg("-epamounts", 1) == 1);
+    if (fEPAmounts) LogPrintf("Using Extented Precision amounts\n");
+    else LogPrintf("Using Standard Precision amounts\n");
 
     fDebug = !mapMultiArgs["-debug"].empty();
     // Special-case: if -debug=0/-nodebug is set, turn off debugging messages
