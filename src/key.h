@@ -14,6 +14,8 @@
 #include <stdexcept>
 #include <vector>
 
+#include <openssl/ec.h> // for EC_KEY definition
+
 // secp256k1:
 // const unsigned int PRIVATE_KEY_SIZE = 279;
 // const unsigned int PUBLIC_KEY_SIZE  = 65;
