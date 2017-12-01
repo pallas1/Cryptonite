@@ -48,7 +48,6 @@ test_bitcoin_SOURCES = \
   allocator_tests.cpp \
   base32_tests.cpp \
   base64_tests.cpp \
-  bignum_tests.cpp \
   bloom_tests.cpp \
   checkblock_tests.cpp \
   Checkpoints_tests.cpp \

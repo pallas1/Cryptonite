@@ -839,13 +839,13 @@ static const int64_t nInterval = nTargetTimespan / nTargetSpacing;
 //
 unsigned int ComputeMinWork(unsigned int nBase, int64_t nTime)
 {
-    const CBigNum &bnLimit = Params().ProofOfWorkLimit();
+    const uint256 &bnLimit = Params().ProofOfWorkLimit();
     // Testnet has min-difficulty blocks
     // after nTargetSpacing*2 time between blocks:
     if (TestNet() && nTime > nTargetSpacing*2)
         return bnLimit.GetCompact();
 
-    CBigNum bnResult;
+    uint256 bnResult;
     bnResult.SetCompact(nBase);
     while (nTime > 0 && bnResult < bnLimit)
     {
@@ -942,8 +942,8 @@ uint64_t GetNextMaxSize(const CBlockIndex* pindexLast){
 
 uint256 GetTargetWork(double nBits){
 
-    CBigNum bnTarget = Params().ProofOfWorkLimit();
-    uint256 target = bnTarget.getuint256();
+    uint256 bnTarget = Params().ProofOfWorkLimit();
+    uint256 target = bnTarget;
 
     //printf("Target: %s\n", target.GetHex().c_str());
 
@@ -977,12 +977,16 @@ uint256 GetTargetWork(double nBits){
 
 bool CheckProofOfWork(uint256 hash, double nBits)
 {
+    bool fNegative;
+    bool fOverflow;
     uint256 target = GetTargetWork(nBits);
+    target.SetCompact(nBits, &fNegative, &fOverflow);
 
     //printf("%s %f\n", hash.GetHex().c_str(), nBits);
     // Check range
 #if 0
-    if (bnTarget <= 0 || bnTarget > Params().ProofOfWorkLimit())
+    // if (bnTarget <= 0 || bnTarget > Params().ProofOfWorkLimit())
+    if (fNegative || bnTarget <= 0 || fOverflow || bnTarget > Params().ProofOfWorkLimit())
         return error("CheckProofOfWork() : nBits below minimum work");
 #endif
     // Check proof of work matches claimed amount
@@ -1071,7 +1075,7 @@ void CheckForkWarningConditions(bool fReorganized = false)
     // the 72-block condition and from this always have the most-likely-to-cause-warning fork
     CBlockIndex *pindexBestForkBase = NULL;
     CBlockIndex *pindexBestForkTip = NULL;
-    if (pindexBestInvalid && pindexBestInvalid->nChainWork > chainActive.Tip()->nChainWork + (chainActive.Tip()->GetBlockWork() * 6).getuint256()) {
+    if (pindexBestInvalid && pindexBestInvalid->nChainWork > chainActive.Tip()->nChainWork + (chainActive.Tip()->GetBlockWork() * 6)) {
         pindexBestForkBase = pindexBestInvalid->pprev;
     } else if (fReorganized) {
         // Find a fork up to 72 blocks deep.
@@ -1093,7 +1097,7 @@ void CheckForkWarningConditions(bool fReorganized = false)
     }
 
     if (pindexBestForkTip && pindexBestForkBase) {
-        if (pindexBestForkBase == chainHeaders.Tip() || pindexBestForkTip->nChainWork < (pindexBestForkBase->GetBlockWork() * 72).getuint256() + pindexBestForkBase->nChainWork) {
+        if (pindexBestForkBase == chainHeaders.Tip() || pindexBestForkTip->nChainWork < (pindexBestForkBase->GetBlockWork() * 72) + pindexBestForkBase->nChainWork) {
             LogPrintf("CheckForkWarningConditions(): best fork is not dangerous");
             pindexBestForkBase = NULL;
         }
@@ -1170,7 +1174,7 @@ void InvalidBlockFound(CBlockIndex *pindex) {
     // Update pindexBestInvalid if necessary.
     if (pindexBestInvalid==NULL || pindexWalk->nChainWork > pindexBestInvalid->nChainWork) {
         pindexBestInvalid = pindexWalk;
-        pblocktree->WriteBestInvalidWork(CBigNum(pindexWalk->nChainWork)); // only for compatibility
+        // pblocktree->WriteBestInvalidWork(CBigNum(pindexWalk->nChainWork)); // only for compatibility
         uiInterface.NotifyBlocksChanged();
     }
 
@@ -2615,12 +2619,12 @@ bool static LinkOrphans(const uint256 *phashParent) {
             // Deal with the genesis block specially.
             pindexGenesisBlock = pindex;
             pindex->fConnected=true;
-            pindex->nChainWork = pindex->GetBlockWork().getuint256();
+            pindex->nChainWork = pindex->GetBlockWork();
             pindex->nStatus = (pindex->nStatus & ~BLOCK_VALID_MASK) | BLOCK_VALID_TRANSACTIONS;
             pindex->nStatus &= ~BLOCK_FAILED_MASK;
         } else {
             pindex->pprev = mapBlockIndex[hashPrev];
-            pindex->nChainWork = pindex->pprev->nChainWork + pindex->GetBlockWork().getuint256();
+            pindex->nChainWork = pindex->pprev->nChainWork + pindex->GetBlockWork();
             if (pindex->nTx && pindex->pprev->nChainTx)
                 pindex->nChainTx = pindex->pprev->nChainTx + pindex->nTx;
             if (pindex->pprev->nStatus & BLOCK_FAILED_MASK) {

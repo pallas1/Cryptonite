@@ -7,6 +7,7 @@
 #ifndef BITCOIN_UINT256_H
 #define BITCOIN_UINT256_H
 
+#include <assert.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <string>
@@ -348,6 +349,42 @@ public:
         return (!(a == b));
     }
 
+    // imported from Bitcoin 0.9
+
+    base_uint& operator*=(uint32_t b32)
+    {
+        uint64_t carry = 0;
+        for (int i = 0; i < WIDTH; i++)
+        {
+            uint64_t n = carry + (uint64_t)b32 * pn[i];
+            pn[i] = n & 0xffffffff;
+            carry = n >> 32;
+        }
+        return *this;
+    }
+
+    base_uint& operator*=(const base_uint& b)
+    {
+        base_uint a = *this;
+        *this = 0;
+        for (int j = 0; j < WIDTH; j++) {
+            uint64_t carry = 0;
+            for (int i = 0; i + j < WIDTH; i++) {
+                uint64_t n = carry + pn[i + j] + (uint64_t)a.pn[j] * b.pn[i];
+                pn[i + j] = n & 0xffffffff;
+                carry = n >> 32;
+            }
+        }
+        return *this;
+    }
+
+
+    friend inline const base_uint operator>>(const base_uint& a, int shift) { return base_uint(a) >>= shift; }
+    friend inline const base_uint operator*(const base_uint& a, uint32_t b) { return base_uint(a) *= b; }
+    friend inline const base_uint operator<<(const base_uint& a, int shift) { return base_uint(a) <<= shift; }
+
+
+
     std::string GetHex() const
     {
         char psz[sizeof(pn)*2 + 1];
@@ -538,10 +575,10 @@ public:
 
 inline bool operator==(const uint160& a, uint64_t b)                         { return (base_uint160)a == b; }
 inline bool operator!=(const uint160& a, uint64_t b)                         { return (base_uint160)a != b; }
-inline const uint160 operator<<(const base_uint160& a, unsigned int shift)   { return uint160(a) <<= shift; }
-inline const uint160 operator>>(const base_uint160& a, unsigned int shift)   { return uint160(a) >>= shift; }
-inline const uint160 operator<<(const uint160& a, unsigned int shift)        { return uint160(a) <<= shift; }
-inline const uint160 operator>>(const uint160& a, unsigned int shift)        { return uint160(a) >>= shift; }
+//inline const uint160 operator<<(const base_uint160& a, unsigned int shift)   { return uint160(a) <<= shift; }
+//inline const uint160 operator>>(const base_uint160& a, unsigned int shift)   { return uint160(a) >>= shift; }
+//inline const uint160 operator<<(const uint160& a, unsigned int shift)        { return uint160(a) <<= shift; }
+//inline const uint160 operator>>(const uint160& a, unsigned int shift)        { return uint160(a) >>= shift; }
 
 inline const uint160 operator^(const base_uint160& a, const base_uint160& b) { return uint160(a) ^= b; }
 inline const uint160 operator&(const base_uint160& a, const base_uint160& b) { return uint160(a) &= b; }
@@ -646,14 +683,87 @@ public:
         else
             *this = 0;
     }
+
+    // The "compact" format is a representation of a whole
+    // number N using an unsigned 32bit number similar to a
+    // floating point format.
+    // The most significant 8 bits are the unsigned exponent of base 256.
+    // This exponent can be thought of as "number of bytes of N".
+    // The lower 23 bits are the mantissa.
+    // Bit number 24 (0x800000) represents the sign of N.
+    // N = (-1^sign) * mantissa * 256^(exponent-3)
+    //
+    // Satoshi's original implementation used BN_bn2mpi() and BN_mpi2bn().
+    // MPI uses the most significant bit of the first byte as sign.
+    // Thus 0x1234560000 is compact (0x05123456)
+    // and  0xc0de000000 is compact (0x0600c0de)
+    // (0x05c0de00) would be -0x40de000000
+    //
+    // Bitcoin only uses this "compact" format for encoding difficulty
+    // targets, which are unsigned 256bit quantities.  Thus, all the
+    // complexities of the sign bit and using base 256 are probably an
+    // implementation accident.
+    //
+    // This implementation directly uses shifts instead of going
+    // through an intermediate MPI representation.
+    uint256& SetCompact(uint32_t nCompact, bool *pfNegative = NULL, bool *pfOverflow = NULL)
+    {
+        int nSize = nCompact >> 24;
+        uint32_t nWord = nCompact & 0x007fffff;
+        if (nSize <= 3)
+        {
+            nWord >>= 8*(3-nSize);
+            *this = nWord;
+        }
+        else
+        {
+            *this = nWord;
+            *this <<= 8*(nSize-3);
+        }
+        if (pfNegative)
+            *pfNegative = nWord != 0 && (nCompact & 0x00800000) != 0;
+        if (pfOverflow)
+            *pfOverflow = nWord != 0 && ((nSize > 34) ||
+                                         (nWord > 0xff && nSize > 33) ||
+                                         (nWord > 0xffff && nSize > 32));
+        return *this;
+    }
+
+    uint32_t GetCompact(bool fNegative = false) const
+    {
+        int nSize = (bits() + 7) / 8;
+        uint32_t nCompact = 0;
+        if (nSize <= 3)
+            nCompact = GetLow64() << 8*(3-nSize);
+        else
+        {
+            uint256 bn = *this >> 8*(nSize-3);
+            nCompact = bn.GetLow64();
+        }
+        // The 0x00800000 bit denotes the sign.
+        // Thus, if it is already set, divide the mantissa by 256 and increase the exponent.
+        if (nCompact & 0x00800000)
+        {
+            nCompact >>= 8;
+            nSize++;
+        }
+        assert((nCompact & ~0x007fffff) == 0);
+        assert(nSize < 256);
+        nCompact |= nSize << 24;
+        nCompact |= (fNegative && (nCompact & 0x007fffff) ? 0x00800000 : 0);
+        return nCompact;
+    }
+
+
+
 };
 
 inline bool operator==(const uint256& a, uint64_t b)                          { return (base_uint256)a == b; }
 inline bool operator!=(const uint256& a, uint64_t b)                          { return (base_uint256)a != b; }
-inline const uint256 operator<<(const base_uint256& a, unsigned int shift)   { return uint256(a) <<= shift; }
-inline const uint256 operator>>(const base_uint256& a, unsigned int shift)   { return uint256(a) >>= shift; }
-inline const uint256 operator<<(const uint256& a, unsigned int shift)        { return uint256(a) <<= shift; }
-inline const uint256 operator>>(const uint256& a, unsigned int shift)        { return uint256(a) >>= shift; }
+//inline const uint256 operator<<(const base_uint256& a, unsigned int shift)   { return uint256(a) <<= shift; }
+//inline const uint256 operator>>(const base_uint256& a, unsigned int shift)   { return uint256(a) >>= shift; }
+//inline const uint256 operator<<(const uint256& a, unsigned int shift)        { return uint256(a) <<= shift; }
+//inline const uint256 operator>>(const uint256& a, unsigned int shift)        { return uint256(a) >>= shift; }
 
 inline const uint256 operator^(const base_uint256& a, const base_uint256& b) { return uint256(a) ^= b; }
 inline const uint256 operator&(const base_uint256& a, const base_uint256& b) { return uint256(a) &= b; }
@@ -774,10 +884,10 @@ public:
 
 inline bool operator==(const uint512& a, uint64_t b) { return (base_uint512)a == b; }
 inline bool operator!=(const uint512& a, uint64_t b) { return (base_uint512)a != b; }
-inline const uint512 operator<<(const base_uint512& a, unsigned int shift) { return uint512(a) <<= shift; }
-inline const uint512 operator>>(const base_uint512& a, unsigned int shift) { return uint512(a) >>= shift; }
-inline const uint512 operator<<(const uint512& a, unsigned int shift) { return uint512(a) <<= shift; }
-inline const uint512 operator>>(const uint512& a, unsigned int shift) { return uint512(a) >>= shift; }
+// inline const uint512 operator<<(const base_uint512& a, unsigned int shift) { return uint512(a) <<= shift; }
+// inline const uint512 operator>>(const base_uint512& a, unsigned int shift) { return uint512(a) >>= shift; }
+// inline const uint512 operator<<(const uint512& a, unsigned int shift) { return uint512(a) <<= shift; }
+// inline const uint512 operator>>(const uint512& a, unsigned int shift) { return uint512(a) >>= shift; }
 
 inline const uint512 operator^(const base_uint512& a, const base_uint512& b) { return uint512(a) ^= b; }
 inline const uint512 operator&(const base_uint512& a, const base_uint512& b) { return uint512(a) &= b; }

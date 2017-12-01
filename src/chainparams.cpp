@@ -27,7 +27,7 @@ unsigned int pnSeed[] =
 
 void MineGenesis(CBlock genesis){
     // This will figure out a valid hash and Nonce if you're creating a different genesis block:
-    uint256 hashTarget = CBigNum().SetCompact(Params().ProofOfWorkLimit().GetCompact()).getuint256();
+    uint256 hashTarget = uint256().SetCompact(Params().ProofOfWorkLimit().GetCompact());
     printf("Target: %s\n", hashTarget.GetHex().c_str());
     uint256 newhash = genesis.GetHash();
     uint256 besthash;
@@ -61,7 +61,7 @@ public:
         vAlertPubKey = ParseHex("038b1e94fa4d647bb8ea50b1540b2a04846181fd10d87e35b609311054ab02cba3");
         nDefaultPort = 8253;
         nRPCPort = 8252;
-        bnProofOfWorkLimit = CBigNum(~uint256(0) >> 20);
+        bnProofOfWorkLimit = ~uint256(0) >> 20;
         nSubsidyHalvingInterval = 210000;
 
 //printf("Target: %s\n", GetTargetWork(4096.0).GetHex().c_str()); exit(0);

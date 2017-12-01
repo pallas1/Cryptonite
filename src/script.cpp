@@ -6,7 +6,7 @@
 
 #include "script.h"
 
-#include "bignum.h"
+// #include "bignum.h" // new
 #include "core.h"
 #include "hash.h"
 #include "key.h"

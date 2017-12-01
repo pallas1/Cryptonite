@@ -20,11 +20,12 @@ bool CBlockTreeDB::WriteBlockIndex(const CDiskBlockIndex& blockindex)
     return Write(make_pair('b', blockindex.GetBlockHash()), blockindex);
 }
 
-bool CBlockTreeDB::WriteBestInvalidWork(const CBigNum& bnBestInvalidWork)
+/* bool CBlockTreeDB::WriteBestInvalidWork(const CBigNum& bnBestInvalidWork)
 {
     // Obsolete; only written for backward compatibility.
     return Write('I', bnBestInvalidWork);
 }
+*/ // eliminated for OpenSSL1.1 compatibility
 
 bool CBlockTreeDB::WriteSyncPoint(uint256 p){
     return Write('S', p); 
