@@ -302,8 +302,8 @@ public:
                 }
             }
             assert(fOk);
-            BN_bn2bin(sig_r,&p64[33-(nBitsR+7)/8]);
-            BN_bn2bin(sig_s,&p64[65-(nBitsS+7)/8]);
+            BN_bn2bin(sig_r,&p64[32-(nBitsR+7)/8]);
+            BN_bn2bin(sig_s,&p64[64-(nBitsS+7)/8]);
             
         }
         ECDSA_SIG_free(sig);
