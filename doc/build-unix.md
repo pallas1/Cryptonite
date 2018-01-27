@@ -6,7 +6,9 @@ To Build
 ---------------------
 
 	./autogen.sh
-	./configure
+	CPPFLAGS="-fPIC" \
+	CFLAGS="-fPIC" \
+	./configure --with-gui=qt5 --disable-hardening --disable-tests
 	make
 
 This will build bitcoin-qt as well if the dependencies are met.
