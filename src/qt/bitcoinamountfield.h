@@ -48,7 +48,7 @@ public:
     */
     QWidget *setupTabChain(QWidget *prev);
 
-signals:
+Q_SIGNALS:
     void textChanged();
 
 protected:
@@ -64,7 +64,7 @@ private:
     void setText(const QString &text);
     QString text() const;
 
-private slots:
+private Q_SLOTS:
     void unitChanged(int idx);
 
 };

@@ -41,7 +41,7 @@ public:
     void pasteEntry(const SendCoinsRecipient &rv);
     bool handlePaymentRequest(const SendCoinsRecipient &recipient);
 
-public slots:
+public Q_SLOTS:
     void clear();
     void reject();
     void accept();
@@ -55,11 +55,11 @@ private:
     bool fNewRecipientAllowed;
 
     // Process WalletModel::SendCoinsReturn and generate a pair consisting
-    // of a message and message flags for use in emit message().
+    // of a message and message flags for use in Q_EMIT message().
     // Additional parameter msgArg can be used via .arg(msgArg).
     void processSendCoinsReturn(const WalletModel::SendCoinsReturn &sendCoinsReturn, const QString &msgArg = QString());
 
-private slots:
+private Q_SLOTS:
     void on_sendButton_clicked();
     void removeEntry(SendCoinsEntry* entry);
     void updateDisplayUnit();
@@ -77,7 +77,7 @@ private slots:
     void coinControlClipboardLowOutput();
     void coinControlClipboardChange();
 
-signals:
+Q_SIGNALS:
     // Fired when a message should be reported to the user
     void message(const QString &title, const QString &message, unsigned int style);
 };

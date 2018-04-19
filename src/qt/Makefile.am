@@ -5,7 +5,7 @@ AM_CPPFLAGS += -I$(top_srcdir)/src \
   -I$(top_builddir)/src/qt/forms \
   $(PROTOBUF_CFLAGS) \
   $(QR_CFLAGS) \
-  -fpermissive -ffloat-store -std=c++11 -D__STDC_LIMIT_MACROS -D__USE_MINGW_ANSI_STDIO
+  -fpermissive -ffloat-store -std=c++11 -DQT_NO_KEYWORDS -D__STDC_LIMIT_MACROS -D__USE_MINGW_ANSI_STDIO
 bin_PROGRAMS = cryptonite-qt
 noinst_LIBRARIES = libcryptoniteqt.a
 SUBDIRS = . 
@@ -90,6 +90,7 @@ QT_FORMS_UI = \
   forms/addressbookpage.ui \
   forms/askpassphrasedialog.ui \
   forms/coincontroldialog.ui \
+  forms/debugwindow.ui \
   forms/editaddressdialog.ui \
   forms/helpmessagedialog.ui \
   forms/intro.ui \
@@ -98,7 +99,6 @@ QT_FORMS_UI = \
   forms/overviewpage.ui \
   forms/receivecoinsdialog.ui \
   forms/receiverequestdialog.ui \
-  forms/rpcconsole.ui \
   forms/sendcoinsdialog.ui \
   forms/sendcoinsentry.ui \
   forms/signverifymessagedialog.ui \
