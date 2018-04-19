@@ -29,10 +29,12 @@
 #include "wallet.h"
 #endif
 
+#include <memory>
 #include <stdint.h>
 
 #include <boost/filesystem/operations.hpp>
 #include <QApplication>
+#include <QDebug>
 #include <QLibraryInfo>
 #include <QLocale>
 #include <QMessageBox>
@@ -50,8 +52,12 @@ Q_IMPORT_PLUGIN(qtwcodecs)
 Q_IMPORT_PLUGIN(qkrcodecs)
 Q_IMPORT_PLUGIN(qtaccessiblewidgets)
 #else
+#if QT_VERSION < 0x050400
 Q_IMPORT_PLUGIN(AccessibleFactory)
-Q_IMPORT_PLUGIN(QWindowsIntegrationPlugin);
+Q_IMPORT_PLUGIN(QWindowsIntegrationPlugin)
+#else
+Q_IMPORT_PLUGIN(QWindowsIntegrationPlugin)
+#endif
 #endif
 #endif
 
@@ -146,11 +152,11 @@ class BitcoinCore: public QObject
 public:
     explicit BitcoinCore();
 
-public slots:
+public Q_SLOTS:
     void initialize();
     void shutdown();
 
-signals:
+Q_SIGNALS:
     void initializeResult(int retval);
     void shutdownResult(int retval);
     void runawayException(const QString &message);
@@ -189,13 +195,13 @@ public:
     /// Get process return value
     int getReturnValue() { return returnValue; }
 
-public slots:
+public Q_SLOTS:
     void initializeResult(int retval);
     void shutdownResult(int retval);
     /// Handle runaway exceptions. Shows a message box with the problem and quits the program.
     void handleRunawayException(const QString &message);
 
-signals:
+Q_SIGNALS:
     void requestedInitialize();
     void requestedShutdown();
     void stopThread();
@@ -226,14 +232,14 @@ BitcoinCore::BitcoinCore():
 void BitcoinCore::handleRunawayException(std::exception *e)
 {
     PrintExceptionContinue(e, "Runaway exception");
-    emit runawayException(QString::fromStdString(strMiscWarning));
+    Q_EMIT runawayException(QString::fromStdString(strMiscWarning));
 }
 
 void BitcoinCore::initialize()
 {
     try
     {
-        LogPrintf("Running AppInit2 in thread\n");
+        qDebug() << __func__ << ": Running AppInit2 in thread";
         int rv = AppInit2(threadGroup);
         if(rv)
         {
@@ -242,7 +248,7 @@ void BitcoinCore::initialize()
              */
             StartDummyRPCThread();
         }
-        emit initializeResult(rv);
+        Q_EMIT initializeResult(rv);
     } catch (std::exception& e) {
         handleRunawayException(&e);
     } catch (...) {
@@ -254,12 +260,12 @@ void BitcoinCore::shutdown()
 {
     try
     {
-        LogPrintf("Running Shutdown in thread\n");
+        qDebug() << __func__ << ": Running Shutdown in thread";
         threadGroup.interrupt_all();
         threadGroup.join_all();
         Shutdown();
-        LogPrintf("Shutdown finished\n");
-        emit shutdownResult(1);
+        qDebug() << __func__ << ": Shutdown finished";
+        Q_EMIT shutdownResult(1);
     } catch (std::exception& e) {
         handleRunawayException(&e);
     } catch (...) {
@@ -281,15 +287,17 @@ BitcoinApplication::BitcoinApplication(int &argc, char **argv):
     returnValue(0)
 {
     setQuitOnLastWindowClosed(false);
-    startThread();
 }
 
 BitcoinApplication::~BitcoinApplication()
 {
-    LogPrintf("Stopping thread\n");
-    emit stopThread();
-    coreThread->wait();
-    LogPrintf("Stopped thread\n");
+    if(coreThread)
+    {
+        qDebug() << __func__ << ": Stopping thread";
+        Q_EMIT stopThread();
+        coreThread->wait();
+        qDebug() << __func__ << ": Stopped thread";
+    }
 
     delete window;
     window = 0;
@@ -324,7 +332,9 @@ void BitcoinApplication::createWindow(bool isaTestNet)
 
 void BitcoinApplication::createSplashScreen(bool isaTestNet)
 {
-    SplashScreen *splash = new SplashScreen(QPixmap(), 0, isaTestNet);
+    SplashScreen *splash = new SplashScreen(0, isaTestNet);
+    // We don't hold a direct pointer to the splash screen after creation, so use
+    // Qt::WA_DeleteOnClose to make sure that the window will be deleted eventually.
     splash->setAttribute(Qt::WA_DeleteOnClose);
     splash->show();
     connect(this, SIGNAL(splashFinished(QWidget*)), splash, SLOT(slotFinish(QWidget*)));
@@ -332,6 +342,8 @@ void BitcoinApplication::createSplashScreen(bool isaTestNet)
 
 void BitcoinApplication::startThread()
 {
+    if(coreThread)
+        return;
     coreThread = new QThread(this);
     BitcoinCore *executor = new BitcoinCore();
     executor->moveToThread(coreThread);
@@ -351,13 +363,15 @@ void BitcoinApplication::startThread()
 
 void BitcoinApplication::requestInitialize()
 {
-    LogPrintf("Requesting initialize\n");
-    emit requestedInitialize();
+    qDebug() << __func__ << ": Requesting initialize";
+    startThread();
+    Q_EMIT requestedInitialize();
 }
 
 void BitcoinApplication::requestShutdown()
 {
-    LogPrintf("Requesting shutdown\n");
+    qDebug() << __func__ << ": Requesting shutdown";
+    startThread();
     window->hide();
     window->setClientModel(0);
     pollShutdownTimer->stop();
@@ -374,12 +388,12 @@ void BitcoinApplication::requestShutdown()
     ShutdownWindow::showShutdownWindow(window);
 
     // Request shutdown from core thread
-    emit requestedShutdown();
+    Q_EMIT requestedShutdown();
 }
 
 void BitcoinApplication::initializeResult(int retval)
 {
-    LogPrintf("Initialization result: %i\n", retval);
+    qDebug() << __func__ << ": Initialization result: " << retval;
     // Set exit result: 0 if successful, 1 if failure
     returnValue = retval ? 0 : 1;
     if(retval)
@@ -389,7 +403,7 @@ void BitcoinApplication::initializeResult(int retval)
         paymentServer->setOptionsModel(optionsModel);
 #endif
 
-        emit splashFinished(window);
+        Q_EMIT splashFinished(window);
 
         clientModel = new ClientModel(optionsModel);
         window->setClientModel(clientModel);
@@ -416,6 +430,8 @@ void BitcoinApplication::initializeResult(int retval)
         {
             window->show();
         }
+        Q_EMIT splashFinished(window);
+
 #ifdef ENABLE_WALLET
         // Now that initialization/startup is done, process any command-line
         // bitcoin: URIs or payment requests:
@@ -434,7 +450,7 @@ void BitcoinApplication::initializeResult(int retval)
 
 void BitcoinApplication::shutdownResult(int retval)
 {
-    LogPrintf("Shutdown result: %i\n", retval);
+    qDebug() << __func__ << ": Shutdown result: " << retval;
     quit(); // Exit main loop after shutdown finished
 }
 
@@ -465,6 +481,9 @@ int main(int argc, char *argv[])
 #if QT_VERSION > 0x050100
     // Generate high-dpi pixmaps
     QApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
+#endif
+#if QT_VERSION >= 0x050600
+    QGuiApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 #endif
 #ifdef Q_OS_MAC
     QApplication::setAttribute(Qt::AA_DontShowIconsInMenus);

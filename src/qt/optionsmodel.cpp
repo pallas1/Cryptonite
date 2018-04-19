@@ -280,7 +280,7 @@ bool OptionsModel::setData(const QModelIndex & index, const QVariant & value, in
             // Todo: Add is valid check  and warn via message, if not
             nTransactionFee = value.toLongLong();
             settings.setValue("nTransactionFee", (qint64)nTransactionFee);
-            emit transactionFeeChanged(nTransactionFee);
+            Q_EMIT transactionFeeChanged(nTransactionFee);
             break;
         case SpendZeroConfChange:
             if (settings.value("bSpendZeroConfChange") != value) {
@@ -292,7 +292,7 @@ bool OptionsModel::setData(const QModelIndex & index, const QVariant & value, in
         case DisplayUnit:
             nDisplayUnit = value.toInt();
             settings.setValue("nDisplayUnit", nDisplayUnit);
-            emit displayUnitChanged(nDisplayUnit);
+            Q_EMIT displayUnitChanged(nDisplayUnit);
             break;
         case DisplayAddresses:
             bDisplayAddresses = value.toBool();
@@ -307,7 +307,7 @@ bool OptionsModel::setData(const QModelIndex & index, const QVariant & value, in
         case CoinControlFeatures:
             fCoinControlFeatures = value.toBool();
             settings.setValue("fCoinControlFeatures", fCoinControlFeatures);
-            emit coinControlFeaturesChanged(fCoinControlFeatures);
+            Q_EMIT coinControlFeaturesChanged(fCoinControlFeatures);
             break;
         case DatabaseCache:
             if (settings.value("nDatabaseCache") != value) {
@@ -325,7 +325,7 @@ bool OptionsModel::setData(const QModelIndex & index, const QVariant & value, in
             break;
         }
     }
-    emit dataChanged(index, index);
+    Q_EMIT dataChanged(index, index);
 
     return successful;
 }

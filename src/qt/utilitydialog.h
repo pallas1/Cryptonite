@@ -30,7 +30,7 @@ public:
 private:
     Ui::AboutDialog *ui;
 
-private slots:
+private Q_SLOTS:
     void on_buttonBox_accepted();
 };
 
@@ -52,18 +52,22 @@ private:
     QString coreOptions;
     QString uiOptions;
 
-private slots:
+private Q_SLOTS:
     void on_okButton_accepted();
 };
 
 
 /** "Shutdown" window */
-class ShutdownWindow : public QObject
+class ShutdownWindow : public QWidget
 {
     Q_OBJECT
 
 public:
+    ShutdownWindow(QWidget *parent=0, Qt::WindowFlags f=0);
     static void showShutdownWindow(BitcoinGUI *window);
+
+protected:
+    void closeEvent(QCloseEvent *event);
 };
 
 #endif // UTILITYDIALOG_H

@@ -195,14 +195,14 @@ QString TransactionDesc::toHTML(CWallet *wallet, CWalletTx &wtx, int vout, int u
         strHTML += "<b>" + tr("Transaction ID") + ":</b> " + QString::fromStdString(wtx.GetTxID().ToString()) + "<br>";
 #if 0 //TODO: wtf is this stuff?
         // Message from normal bitcoin:URI (bitcoin:123...?message=example)
-        foreach (const PAIRTYPE(string, string)& r, wtx.vOrderForm)
+        Q_FOREACH (const PAIRTYPE(string, string)& r, wtx.vOrderForm)
             if (r.first == "Message")
                 strHTML += "<br><b>" + tr("Message") + ":</b><br>" + GUIUtil::HtmlEscape(r.second, true) + "<br>";
 
         //
         // PaymentRequest info:
         //
-        foreach (const PAIRTYPE(string, string)& r, wtx.vOrderForm)
+        Q_FOREACH (const PAIRTYPE(string, string)& r, wtx.vOrderForm)
         {
             if (r.first == "PaymentRequest")
             {

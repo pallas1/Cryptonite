@@ -142,7 +142,7 @@ void SendCoinsDialog::on_sendButton_clicked()
 
     // Format confirmation message
     QStringList formatted;
-    foreach(const SendCoinsRecipient &rcp, recipients)
+    Q_FOREACH (const SendCoinsRecipient &rcp, recipients)
     {
         // generate bold amount string
         QString amount = "<b>" + BitcoinUnits::formatWithUnit(model->getOptionsModel()->getDisplayUnit(), rcp.amount);
@@ -222,7 +222,7 @@ void SendCoinsDialog::on_sendButton_clicked()
     questionString.append("<hr />");
     qint64 totalAmount = currentTransaction.getTotalTransactionAmount() + txFee;
     QStringList alternativeUnits;
-    foreach(BitcoinUnits::Unit u, BitcoinUnits::availableUnits())
+    Q_FOREACH(BitcoinUnits::Unit u, BitcoinUnits::availableUnits())
     {
         if(u != model->getOptionsModel()->getDisplayUnit())
             alternativeUnits.append(BitcoinUnits::formatWithUnit(u, totalAmount));
@@ -386,7 +386,7 @@ bool SendCoinsDialog::handlePaymentRequest(const SendCoinsRecipient &rv)
         const payments::PaymentDetails& details = rv.paymentRequest.getDetails();
         if (details.has_expires() && (int64_t)details.expires() < GetTime())
         {
-            emit message(strSendCoins, tr("Payment request expired"),
+            Q_EMIT message(strSendCoins, tr("Payment request expired"),
                 CClientUIInterface::MSG_WARNING);
             return false;
         }
@@ -394,7 +394,7 @@ bool SendCoinsDialog::handlePaymentRequest(const SendCoinsRecipient &rv)
     else {
         CBitcoinAddress address(rv.address.toStdString());
         if (!address.IsValid()) {
-            emit message(strSendCoins, tr("Invalid payment address %1").arg(rv.address),
+            Q_EMIT message(strSendCoins, tr("Invalid payment address %1").arg(rv.address),
                 CClientUIInterface::MSG_WARNING);
             return false;
         }
@@ -460,7 +460,7 @@ void SendCoinsDialog::processSendCoinsReturn(const WalletModel::SendCoinsReturn 
         return;
     }
 
-    emit message(tr("Send Coins"), msgParams.first, msgParams.second);
+    Q_EMIT message(tr("Send Coins"), msgParams.first, msgParams.second);
 }
 
 // Coin Control: copy label "Quantity" to clipboard
