@@ -49,7 +49,7 @@ SplashScreen::SplashScreen(Qt::WindowFlags f, bool isTestNet) :
     }
 
     QPainter pixPaint(&pixmap);
-    pixPaint.setPen(QColor(100,100,100));
+    pixPaint.setPen(QColor(Qt::white));
 
     // check font size and drawing with
     pixPaint.setFont(QFont(font, 33*fontFactor));
@@ -124,7 +124,7 @@ static void InitMessage(SplashScreen *splash, const std::string &message)
         Qt::QueuedConnection,
         Q_ARG(QString, QString::fromStdString(message)),
         Q_ARG(int, Qt::AlignBottom|Qt::AlignHCenter),
-        Q_ARG(QColor, QColor(55,55,55)));
+        Q_ARG(QColor, QColor(Qt::white)));
 }
 
 static void ShowProgressF(SplashScreen *splash, const std::string &title, int nProgress)
