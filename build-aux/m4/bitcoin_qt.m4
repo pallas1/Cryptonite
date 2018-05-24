@@ -241,7 +241,7 @@ AC_DEFUN([_BITCOIN_QT_FIND_LIBS_WITH_PKGCONFIG],[
         [bitcoin_cv_old_qt=no])
     ])
      if test "x$bitcoin_cv_old_qt" = xyes; then
-      qt5_modules="Qt5Core Qt5Gui Qt5Network Qt5Widgets QtTest QtDBus QtEventDispatcherSupport QtFontDatabaseSupport QtThemeSupport QtAccessibilitySupport"
+      qt5_modules="Qt5Core Qt5Gui Qt5Network Qt5Widgets QtTest QtDBus QtEventDispatcherSupport QtFontDatabaseSupport QtThemeSupport QtAccessibilitySupport QtWindowsUIAutomationSupport"
       qt4_modules="QtCore QtGui QtNetwork"
      else    
       qt5_modules="Qt5Core Qt5Gui Qt5Network Qt5Widgets"
