@@ -241,7 +241,7 @@ AC_DEFUN([_BITCOIN_QT_FIND_LIBS_WITH_PKGCONFIG],[
         [bitcoin_cv_old_qt=no])
     ])
      if test "x$bitcoin_cv_old_qt" = xyes; then
-      qt5_modules="Qt5Core Qt5Gui Qt5Network Qt5Widgets QtTest QtDBus QtEventDispatcherSupport QtFontDatabaseSupport QtThemeSupport QtAccessibilitySupport"
+      qt5_modules="Qt5Core Qt5Gui Qt5Network Qt5Widgets QtTest QtDBus QtEventDispatcherSupport QtFontDatabaseSupport QtThemeSupport QtAccessibilitySupport QtWindowsUIAutomationSupport"
       qt4_modules="QtCore QtGui QtNetwork"
      else    
       qt5_modules="Qt5Core Qt5Gui Qt5Network Qt5Widgets"
@@ -288,7 +288,7 @@ AC_DEFUN([_BITCOIN_QT_FIND_LIBS_WITHOUT_PKGCONFIG],[
   TEMP_LIBS="$LIBS"
   BITCOIN_QT_CHECK([
     if test x$qt_include_path != x; then
-      QT_INCLUDES="-I$qt_include_path -I$qt_include_path/QtCore -I$qt_include_path/QtGui -I$qt_include_path/QtWidgets -I$qt_include_path/QtNetwork -I$qt_include_path/QtTest -I$qt_include_path/QtDBus -I$qt_include_path/QtEventDispatcherSupport -I$qt_include_path/QtFontDatabaseSupport -I$qt_include_path/QtThemeSupport  -I$qt_include_path/QtAccessibilitySupport"
+      QT_INCLUDES="-I$qt_include_path -I$qt_include_path/QtCore -I$qt_include_path/QtGui -I$qt_include_path/QtWidgets -I$qt_include_path/QtNetwork -I$qt_include_path/QtTest -I$qt_include_path/QtDBus -I$qt_include_path/QtEventDispatcherSupport -I$qt_include_path/QtFontDatabaseSupport -I$qt_include_path/QtThemeSupport  -I$qt_include_path/QtAccessibilitySupport -I$qt_include_path/QtWindowsUIAutomationSupport"
       CPPFLAGS="$QT_INCLUDES $CPPFLAGS"
     fi
   ])
@@ -335,12 +335,12 @@ AC_DEFUN([_BITCOIN_QT_FIND_LIBS_WITHOUT_PKGCONFIG],[
   BITCOIN_QT_CHECK(AC_CHECK_LIB([${QT_LIB_PREFIX}Gui]    ,[main],,BITCOIN_QT_FAIL(lib$QT_LIB_PREFIXGui not found)))
   BITCOIN_QT_CHECK(AC_CHECK_LIB([${QT_LIB_PREFIX}Network],[main],,BITCOIN_QT_FAIL(lib$QT_LIB_PREFIXNetwork not found)))
   if test x$bitcoin_qt_got_major_vers == x5; then
-#//    BITCOIN_QT_CHECK(AC_CHECK_LIB([pcre2-16], [pcre2_match_16],,BITCOIN_QT_FAIL(libpcre2 not found.)))
     BITCOIN_QT_CHECK(AC_CHECK_LIB([${QT_LIB_PREFIX}Widgets],[main],,BITCOIN_QT_FAIL(lib$QT_LIB_PREFIXWidgets not found)))
     BITCOIN_QT_CHECK(AC_CHECK_LIB([${QT_LIB_PREFIX}EventDispatcherSupport],[main],,BITCOIN_QT_FAIL(lib$QT_LIB_PREFIXEventDispatcherSupport not found)))
     BITCOIN_QT_CHECK(AC_CHECK_LIB([${QT_LIB_PREFIX}FontDatabaseSupport],[main],,BITCOIN_QT_FAIL(lib$QT_LIB_PREFIXFontDatabaseSupport not found)))
     BITCOIN_QT_CHECK(AC_CHECK_LIB([${QT_LIB_PREFIX}ThemeSupport],[main],,BITCOIN_QT_FAIL(lib$QT_LIB_PREFIXThemeSupport not found)))
     BITCOIN_QT_CHECK(AC_CHECK_LIB([${QT_LIB_PREFIX}AccessibilitySupport],[main],,BITCOIN_QT_FAIL(lib$QT_LIB_PREFIXAccessibilitySupport not found)))
+    BITCOIN_QT_CHECK(AC_CHECK_LIB([${QT_LIB_PREFIX}WindowsUIAutomationSupport],[main],,BITCOIN_QT_FAIL(lib$QT_LIB_PREFIXWindowsUIAutomationSupport not found)))
   fi
   QT_LIBS="$LIBS"
   LIBS="$TEMP_LIBS"

@@ -24,12 +24,12 @@ SplashScreen::SplashScreen(Qt::WindowFlags f, bool isTestNet) :
 
     // set reference point, paddings
     int paddingRight            = 50;
-    int paddingTop              = 50;
+    int paddingTop              = 60;
     int titleVersionVSpace      = 25;
     int titleCopyrightVSpace    = 40;
     int titleCopyright2VSpace   = 15;
 
-    float fontFactor            = 1.0;
+    float fontFactor            = 1.1;
 
     // define text to place
     QString titleText       = tr("Cryptonite");
@@ -38,7 +38,7 @@ SplashScreen::SplashScreen(Qt::WindowFlags f, bool isTestNet) :
     QString copyright2Text   = QChar(0xA9)+QString(" 2014 ") + QString(tr("The Mini-Blockchain Project"));
     QString testnetAddText  = QString(tr("[testnet]")); // define text to place as single text object
 
-    QString font            = "Arial";
+    QString font            = "Open Sans";
 
     // load the bitmap for writing some text over it
     if(isTestNet) {
@@ -49,7 +49,7 @@ SplashScreen::SplashScreen(Qt::WindowFlags f, bool isTestNet) :
     }
 
     QPainter pixPaint(&pixmap);
-    pixPaint.setPen(QColor(100,100,100));
+    pixPaint.setPen(QColor(Qt::lightGray));
 
     // check font size and drawing with
     pixPaint.setFont(QFont(font, 33*fontFactor));
@@ -124,7 +124,7 @@ static void InitMessage(SplashScreen *splash, const std::string &message)
         Qt::QueuedConnection,
         Q_ARG(QString, QString::fromStdString(message)),
         Q_ARG(int, Qt::AlignBottom|Qt::AlignHCenter),
-        Q_ARG(QColor, QColor(55,55,55)));
+        Q_ARG(QColor, QColor(Qt::white)));
 }
 
 static void ShowProgressF(SplashScreen *splash, const std::string &title, int nProgress)
