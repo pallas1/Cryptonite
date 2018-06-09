@@ -62,7 +62,7 @@ Q_IMPORT_PLUGIN(QWindowsIntegrationPlugin)
 #endif
 
 #if defined(QT_QPA_PLATFORM_XCB)
-Q_IMPORT_PLUGIN(QXcbIntegrationPlugin)
+Q_IMPORT_PLUGIN(QXcbIntegrationPlugin);
 #endif
 
 #if QT_VERSION < 0x050000
