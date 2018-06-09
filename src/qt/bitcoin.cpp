@@ -61,6 +61,11 @@ Q_IMPORT_PLUGIN(QWindowsIntegrationPlugin)
 #endif
 #endif
 
+#if defined(QT_QPA_PLATFORM_XCB)
+#include <QtPlugin>
+Q_IMPORT_PLUGIN(QXcbIntegrationPlugin);
+#endif
+
 #if QT_VERSION < 0x050000
 #include <QTextCodec>
 #endif
