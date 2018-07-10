@@ -394,7 +394,7 @@ Value listbalances(const Array& params, bool fHelp)
     if (params.size() > 1)
     {
         Array inputs = params[1].get_array();
-        BOOST_FOREACH(Value& input, inputs)
+        for (Value& input : inputs)
         {
             CBitcoinAddress address(input.get_str());
             if (!address.IsValid())
@@ -481,7 +481,7 @@ Value createrawtransaction(const Array& params, bool fHelp)
     CTransaction rawTx;
 
     set<CBitcoinAddress> setInAddress;
-    BOOST_FOREACH(const Pair& input, inputs)
+    for (const Pair& input : inputs)
     {
     	CBitcoinAddress address(input.name_);
     	if (!address.IsValid())
@@ -502,7 +502,7 @@ Value createrawtransaction(const Array& params, bool fHelp)
     }
 
     set<CBitcoinAddress> setOutAddress;
-    BOOST_FOREACH(const Pair& output, outputs)
+    for (const Pair& output : outputs)
     {
         CBitcoinAddress address(output.name_);
         if (!address.IsValid())
@@ -583,7 +583,7 @@ Value setuprawtransaction(const Array& params, bool fHelp)
     Object inputs = params[1].get_obj();
 
     set<int> indexSet;
-    BOOST_FOREACH(const Pair& cinput, inputs){
+    for (const Pair& cinput : inputs){
 	Pair input = cinput; //Copy to unconst
 	Value index(input.name_);
 	ConvertTo<boost::int64_t>(index);
@@ -700,7 +700,7 @@ Value decoderawtransaction(const Array& params, bool fHelp)
     	Object inputs = params[1].get_obj();
 
     	set<int> indexSet;
-    	BOOST_FOREACH(const Pair& cinput, inputs){
+    	for (const Pair& cinput : inputs){
 	    Pair input = cinput; //Copy to unconst
 	    Value index(input.name_);
 	    ConvertTo<boost::int64_t>(index);
@@ -794,7 +794,7 @@ Value signrawtransaction(const Array& params, bool fHelp)
     	Object inputs = params[1].get_obj();
 
     	set<int> indexSet;
-    	BOOST_FOREACH(const Pair& cinput, inputs){
+    	for (const Pair& cinput : inputs){
 	    Pair input = cinput; //Copy to unconst
 	    Value index(input.name_);
 	    ConvertTo<boost::int64_t>(index);
@@ -825,7 +825,7 @@ Value signrawtransaction(const Array& params, bool fHelp)
     {
         fGivenKeys = true;
         Array keys = params[2].get_array();
-        BOOST_FOREACH(Value k, keys)
+        for (Value k : keys)
         {
             CBitcoinSecret vchSecret;
             bool fGood = vchSecret.SetString(k.get_str());

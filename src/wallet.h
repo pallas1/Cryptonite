@@ -279,7 +279,7 @@ public:
 
     bool IsMine(const CTransaction& tx) const
     {
-        BOOST_FOREACH(const CTxOut& txout, tx.vout)
+        for (const CTxOut& txout : tx.vout)
             if (IsMine(txout))
                 return true;
         return false;
@@ -291,7 +291,7 @@ public:
     int64_t GetDebit(const CTransaction& tx) const
     {
         int64_t nDebit = 0;
-        BOOST_FOREACH(const CTxIn& txin, tx.vin)
+        for (const CTxIn& txin : tx.vin)
         {
             nDebit += GetDebit(txin);
             if (!MoneyRange(nDebit))
@@ -302,7 +302,7 @@ public:
     int64_t GetCredit(const CTransaction& tx) const
     {
         int64_t nCredit = 0;
-        BOOST_FOREACH(const CTxOut& txout, tx.vout)
+        for (const CTxOut& txout : tx.vout)
         {
             nCredit += GetCredit(txout);
             if (!MoneyRange(nCredit))

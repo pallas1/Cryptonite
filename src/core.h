@@ -403,7 +403,7 @@ public:
 
     uint64_t GetFees(){
 	uint64_t ret=0;
-	BOOST_FOREACH(CTransaction tx, vtx){
+	for (CTransaction tx : vtx){
 	   ret+=tx.GetFee();
 	}
 	return ret;

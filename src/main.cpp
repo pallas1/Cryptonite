@@ -276,7 +276,7 @@ void FinalizeNode(NodeId nodeid, const CNode *pnode) {
         setBlockDontHave.erase(nodeid);
 	printf("Finalize Node\n");
 
-     	BOOST_FOREACH(CBlockIndex *pindex, pnode->setBlocksAskedFor) {
+     	for (CBlockIndex *pindex : pnode->setBlocksAskedFor) {
             mapBlocksAskedFor.erase(pindex);
 	    mapAlreadyAskedFor.erase(CInv(MSG_BLOCK, pindex->GetBlockHash()));
             UpdateMissingHeight();
@@ -366,7 +366,7 @@ CBlockLocator CChain::GetLocator(const CBlockIndex *pindex) const {
 
 CBlockIndex *CChain::FindFork(const CBlockLocator &locator) const {
     // Find the first block the caller has in the main chain
-    BOOST_FOREACH(const uint256& hash, locator.vHave) {
+    for (const uint256& hash : locator.vHave) {
         std::map<uint256, CBlockIndex*>::iterator mi = mapBlockIndex.find(hash);
         if (mi != mapBlockIndex.end())
         {
@@ -423,7 +423,7 @@ bool AreInputsStandard(const CTransaction& tx)
 unsigned int GetLegacySigOpCount(const CTransaction& tx)
 {
     unsigned int nSigOps = 0;
-    BOOST_FOREACH(const CTxIn& txin, tx.vin)
+    for (const CTxIn& txin : tx.vin)
     {
 	if(txin.scriptSig.size() == 0)
 	    continue;
@@ -477,7 +477,7 @@ bool CheckTransaction(const CTransaction& tx, CValidationState &state)
     }
 
 		if (!tx.IsCoinBase()) {
-			BOOST_FOREACH(const CTxIn& txin, tx.vin)
+			for (const CTxIn& txin : tx.vin)
 			{
 				uint64_t balance=0;
 				pviewTip->Balance(txin.pubKey,balance);
@@ -489,7 +489,7 @@ bool CheckTransaction(const CTransaction& tx, CValidationState &state)
 
     // Check for duplicate inputs
     set<uint160> vInOutPoints;
-    BOOST_FOREACH(const CTxIn& txin, tx.vin)
+    for (const CTxIn& txin : tx.vin)
     {
         if (vInOutPoints.count(txin.pubKey))
             return state.DoS(100, error("CheckTransaction() : duplicate inputs"),
@@ -499,7 +499,7 @@ bool CheckTransaction(const CTransaction& tx, CValidationState &state)
 
     // Check for duplicate outputs
     vInOutPoints.clear();
-    BOOST_FOREACH(const CTxOut& txout, tx.vout)
+    for (const CTxOut& txout : tx.vout)
     {
         if (vInOutPoints.count(txout.pubKey))
             return state.DoS(100, error("CheckTransaction() : duplicate outputs"),
@@ -521,7 +521,7 @@ bool CheckTransaction(const CTransaction& tx, CValidationState &state)
     }
     else
     {
-        BOOST_FOREACH(const CTxIn& txin, tx.vin)
+        for (const CTxIn& txin : tx.vin)
             if (txin.IsNull())
                 return state.DoS(10, error("CheckTransaction() : input is null"),
                                  REJECT_INVALID, "bad-txns-input-null");
@@ -559,7 +559,7 @@ int64_t GetMinFee(const CTransaction& tx, unsigned int nBytes, bool fAllowFree, 
 
 double GetPriority(vector<CTxIn> vtxin){
     double dPriority=0;
-    BOOST_FOREACH(CTxIn txin, vtxin)
+    for (CTxIn txin : vtxin)
     {
 	int64_t nCredit = txin.nValue;
 	dPriority += (double)nCredit * pviewTip->CoinAge(txin.pubKey);
@@ -602,7 +602,7 @@ bool AcceptToMemoryPool(CTxMemPool& pool, CValidationState &state, const CTransa
         // do all inputs exist?
 	vector<CActInfo> balances;
 	vector<uint160> keys;
-        BOOST_FOREACH(const CTxIn txin, tx.vin) {
+        for (const CTxIn txin : tx.vin) {
 	    keys.push_back(txin.pubKey);
         }
 
@@ -626,7 +626,7 @@ bool AcceptToMemoryPool(CTxMemPool& pool, CValidationState &state, const CTransa
         //Make sure that any created accounts would receive at least fee amount
 	balances.clear();
 	keys.clear();
-        BOOST_FOREACH(const CTxOut txout, tx.vout) {
+        for (const CTxOut txout : tx.vout) {
 	    keys.push_back(txout.pubKey);
         }
 	pviewTip->ConservativeBalances(1,keys,balances);
@@ -1245,7 +1245,7 @@ bool DisconnectBlock(CBlock& block, CValidationState& state, CBlockIndex* pindex
     pindex->fConnected = false;
 
     //modify txindex
-    BOOST_FOREACH(CTransaction tx, block.vtx){
+    for (CTransaction tx : block.vtx){
 	if(!pblocktree->EraseTxIndex(tx.GetTxID())){
 	    LogPrintf("DisconnectBlock: Horrible terrible thing happened\n");
 	}
@@ -1483,7 +1483,7 @@ bool static DisconnectTip(CValidationState &state) {
     if (!WriteChainState(state))
         return false;
     // Resurrect mempool transactions from the disconnected block.
-    BOOST_FOREACH(const CTransaction &tx, block.vtx) {
+    for (const CTransaction &tx : block.vtx) {
         // ignore validation errors in resurrected transactions
         list<CTransaction> removed;
         CValidationState stateDummy;
@@ -1494,7 +1494,7 @@ bool static DisconnectTip(CValidationState &state) {
     UpdateTip(pindexDelete->pprev);
     // Let wallets know transactions went from 1-confirmed to
     // 0-confirmed or conflicted:
-    BOOST_FOREACH(const CTransaction &tx, block.vtx) {
+    for (const CTransaction &tx : block.vtx) {
         SyncWithWallets(tx.GetTxID(), tx, NULL);
     }
     mapBlockByHeight.erase(block.nHeight);
@@ -1530,7 +1530,7 @@ bool static ConnectTip(CValidationState &state, CBlockIndex *pindexNew) {
     if (!WriteChainState(state))
         return false;
     // Remove conflicting transactions from the mempool.
-    BOOST_FOREACH(const CTransaction &tx, block.vtx) {
+    for (const CTransaction &tx : block.vtx) {
         mempool.remove(tx);
     }
     // Update chainActive & related variables.
@@ -1538,7 +1538,7 @@ bool static ConnectTip(CValidationState &state, CBlockIndex *pindexNew) {
 
     // ... and about transactions that got confirmed:
     if(!fLoading){
-    	BOOST_FOREACH(const CTransaction &tx, block.vtx) {
+    	for (const CTransaction &tx : block.vtx) {
             SyncWithWallets(tx.GetTxID(), tx, &block);
     	}
     }
@@ -1623,7 +1623,7 @@ static bool ActivateBestChainStep(CValidationState &state) {
     // Tell wallet about transactions that went from mempool
     // to conflicted:
     if(!fLoading){
-    	BOOST_FOREACH(const CTransaction &tx, conflicts) {
+    	for (const CTransaction &tx : conflicts) {
             SyncWithWallets(tx.GetTxID(), tx, NULL);
     	}
     }
@@ -1800,7 +1800,7 @@ bool ActivateBestChain(CValidationState &state) {
         // Relay inventory, but don't relay old inventory during initial block download.
         int nBlockEstimate = Checkpoints::GetTotalBlocksEstimate();
         LOCK(cs_vNodes);
-        BOOST_FOREACH(CNode* pnode, vNodes)
+        for (CNode* pnode : vNodes)
              pnode->PushInventory(CInv(MSG_BLOCK, hashNewTip));
 
         std::string strCmd = GetArg("-blocknotify", "");
@@ -1824,7 +1824,7 @@ bool ActivateTrie(CValidationState &state){
 set<NodeId> AllNodes(){
     set<NodeId> ret;
     LOCK(cs_vNodes);
-    BOOST_FOREACH(CNode* pnode, vNodes){
+    for (CNode* pnode : vNodes){
 	ret.insert(pnode->id);
     }
     return ret;
@@ -1972,21 +1972,21 @@ bool CheckBlock(const CBlock& block, CValidationState& state, bool fCheckPOW, bo
 
     // Check transactions
     if(block.nHeight!=0){
-    	BOOST_FOREACH(const CTransaction& tx, block.vtx)
+    	for (const CTransaction& tx : block.vtx)
             if (!CheckTransaction(tx, state))
             	return error("CheckBlock() : CheckTransaction failed");
     }
 
     //Check for multiple limit updates or withdrawal + limit update combo
     set<uint160> setLimit, setWD;
-    BOOST_FOREACH(const CTransaction& tx, block.vtx){
+    for (const CTransaction& tx : block.vtx){
 	if(tx.fSetLimit){
 	    if(setLimit.count(tx.vin[0].pubKey) || setWD.count(tx.vin[0].pubKey)){
 		return error("CheckBlock() : Limit and withdrawal overlap");
 	    }
 	    setLimit.insert(tx.vin[0].pubKey);
 	}else{
-	    BOOST_FOREACH(const CTxIn txin, tx.vin){
+	    for (const CTxIn txin : tx.vin){
 		if(setLimit.count(txin.pubKey)){
 		    return error("CheckBlock() : Limit and withdrawal overlap");
 		}
@@ -2011,7 +2011,7 @@ bool CheckBlock(const CBlock& block, CValidationState& state, bool fCheckPOW, bo
                          REJECT_INVALID, "bad-txns-duplicate", true);
 
     unsigned int nSigOps = 0;
-    BOOST_FOREACH(const CTransaction& tx, block.vtx)
+    for (const CTransaction& tx : block.vtx)
     {
         nSigOps += GetLegacySigOpCount(tx);
     }
@@ -2160,7 +2160,7 @@ bool static AcceptBlock(CBlock& block, CValidationState& state)
 
     int nHeight = pindexNew->nHeight;
     // Check that all transactions are finalized
-    BOOST_FOREACH(const CTransaction& tx, block.vtx){
+    for (const CTransaction& tx : block.vtx){
         if (!IsFinalTx(tx, nHeight, block.GetBlockTime()))
             return state.DoS(10, error("AcceptBlock() : contains a non-final transaction"));
     }
@@ -3130,7 +3130,7 @@ string GetWarnings(string strFor)
     // Alerts
     {
         LOCK(cs_mapAlerts);
-        BOOST_FOREACH(PAIRTYPE(const uint256, CAlert)& item, mapAlerts)
+        for (PAIRTYPE(const uint256, CAlert)& item : mapAlerts)
         {
             const CAlert& alert = item.second;
             if (alert.AppliesToMe() && alert.nPriority > nPriority)
@@ -3246,7 +3246,7 @@ void static ProcessGetData(CNode* pfrom)
                             // Thus, the protocol spec specified allows for us to provide duplicate txn here,
                             // however we MUST always provide at least what the remote peer needs
                             typedef std::pair<unsigned int, uint256> PairType;
-                            BOOST_FOREACH(PairType& pair, merkleBlock.vMatchedTxn)
+                            for (PairType& pair : merkleBlock.vMatchedTxn)
                                 if (!pfrom->setInventoryKnown.count(CInv(MSG_TX, pair.second)))
                                     pfrom->PushMessage("tx", block.vtx[pair.first]);
                         }
@@ -3425,7 +3425,7 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv)
         // Relay alerts
         {
             LOCK(cs_mapAlerts);
-            BOOST_FOREACH(PAIRTYPE(const uint256, CAlert)& item, mapAlerts)
+            for (PAIRTYPE(const uint256, CAlert)& item : mapAlerts)
                 item.second.RelayTo(pfrom);
         }
 
@@ -3466,7 +3466,7 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv)
         vector<CAddress> vAddrOk;
         int64_t nNow = GetAdjustedTime();
         int64_t nSince = nNow - 10 * 60;
-        BOOST_FOREACH(CAddress& addr, vAddr)
+        for (CAddress& addr : vAddr)
         {
             boost::this_thread::interruption_point();
 
@@ -3488,7 +3488,7 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv)
                     uint256 hashRand = hashSalt ^ (hashAddr<<32) ^ ((GetTime()+hashAddr)/(24*60*60));
                     hashRand = Hash(BEGIN(hashRand), END(hashRand));
                     multimap<uint256, CNode*> mapMix;
-                    BOOST_FOREACH(CNode* pnode, vNodes)
+                    for (CNode* pnode : vNodes)
                     {
                         unsigned int nPointer;
                         memcpy(&nPointer, &pnode, sizeof(nPointer));
@@ -3873,7 +3873,7 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv)
         CBlockIndex *pindexBefore = chainHeaders.Tip();
 
         CValidationState state;
-        BOOST_FOREACH(const CBlock &block, vBlocks) {
+        for (const CBlock &block : vBlocks) {
 	    LOCK(cs_main);
             if (!ProcessBlockHeader(state, &block)) {
                 int nDoS;
@@ -3907,7 +3907,7 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv)
     {
         pfrom->vAddrToSend.clear();
         vector<CAddress> vAddr = addrman.GetAddr();
-        BOOST_FOREACH(const CAddress &addr, vAddr)
+        for (const CAddress &addr : vAddr)
             pfrom->PushAddress(addr);
     }
 
@@ -3919,7 +3919,7 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv)
         std::vector<uint256> vtxid;
         mempool.queryHashes(vtxid);
         vector<CInv> vInv;
-        BOOST_FOREACH(uint256& hash, vtxid) {
+        for (uint256& hash : vtxid) {
             CInv inv(MSG_TX, hash);
             CTransaction tx;
             bool fInMemPool = mempool.lookup(hash, tx);
@@ -4027,7 +4027,7 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv)
                 pfrom->setKnown.insert(alertHash);
                 {
                     LOCK(cs_vNodes);
-                    BOOST_FOREACH(CNode* pnode, vNodes)
+                    for (CNode* pnode : vNodes)
                         alert.RelayTo(pnode);
                 }
             }
@@ -4289,7 +4289,7 @@ bool SendMessages(CNode* pto, bool fSendTrickle)
         {
             {
                 LOCK(cs_vNodes);
-                BOOST_FOREACH(CNode* pnode, vNodes)
+                for (CNode* pnode : vNodes)
                 {
                     // Periodically clear setAddrKnown to allow refresh broadcasts
                     if (nLastRebroadcast)
@@ -4314,7 +4314,7 @@ bool SendMessages(CNode* pto, bool fSendTrickle)
         {
             vector<CAddress> vAddr;
             vAddr.reserve(pto->vAddrToSend.size());
-            BOOST_FOREACH(const CAddress& addr, pto->vAddrToSend)
+            for (const CAddress& addr : pto->vAddrToSend)
             {
                 // returns true if wasn't already contained in the set
                 if (pto->setAddrKnown.insert(addr).second)
@@ -4349,7 +4349,7 @@ bool SendMessages(CNode* pto, bool fSendTrickle)
             state.fShouldBan = false;
         }
 
-        BOOST_FOREACH(const CBlockReject& reject, state.rejects)
+        for (const CBlockReject& reject : state.rejects)
             pto->PushMessage("reject", (string)"block", reject.chRejectCode, reject.strRejectReason, reject.hashBlock);
         state.rejects.clear();
 
@@ -4378,7 +4378,7 @@ bool SendMessages(CNode* pto, bool fSendTrickle)
             LOCK(pto->cs_inventory);
             vInv.reserve(pto->vInventoryToSend.size());
             vInvWait.reserve(pto->vInventoryToSend.size());
-            BOOST_FOREACH(const CInv& inv, pto->vInventoryToSend)
+            for (const CInv& inv : pto->vInventoryToSend)
             {
                 if (pto->setInventoryKnown.count(inv))
                     continue;
@@ -4454,13 +4454,13 @@ bool SendMessages(CNode* pto, bool fSendTrickle)
      	int nLastHeight = std::max(chainHeaders.Height(), pto->pindexLastBlock ? pto->pindexLastBlock->nHeight : pto->nStartingHeight);
     	if (chainActive.Tip() && !fReindex && !fImporting && pto->nServices & NODE_NETWORK) {
 	    list<CBlockIndex*> toremove;
-            BOOST_FOREACH(PAIRTYPE(CBlockIndex*, uint64_t) item, mapBlocksAskedFor){
+            for (PAIRTYPE(CBlockIndex*, uint64_t) item : mapBlocksAskedFor){
 		if(item.second + BLOCK_DOWNLOAD_TIMEOUT < (uint64_t)GetTime())
 		   toremove.push_back(item.first);
 	    }
-	    BOOST_FOREACH(CBlockIndex* item, toremove){
+	    for (CBlockIndex* item : toremove){
         	LOCK(cs_vNodes);
-        	BOOST_FOREACH(CNode* pnode, vNodes){
+        	for (CNode* pnode : vNodes){
 		    if(pnode->setBlocksAskedFor.count(item)){
                     	LogPrintf("Block download stalled by %s; disconnecting\n", pnode->addr.ToString().c_str());
                     	pnode->fDisconnect = true;
@@ -4473,7 +4473,7 @@ bool SendMessages(CNode* pto, bool fSendTrickle)
 	    //printf("blocks asked for: %ld setHeightMissing: %ld\n", pto->setBlocksAskedFor.size(), setHeightMissing.size());
 	    //if(mapBlocksAskedFor.size())
 	    //	printf("Time: %ld %ld\n", mapBlocksAskedFor.begin()->second, GetTime());
-	    BOOST_FOREACH(int nHeight, setHeightMissing){
+	    for (int nHeight : setHeightMissing){
                 if ((int)pto->setBlocksAskedFor.size() >= MAX_BLOCKS_IN_TRANSIT_PER_PEER)
 		    break;
 

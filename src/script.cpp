@@ -189,7 +189,7 @@ bool SignN(const vector<valtype>& multisigdata, const CKeyStore& keystore, uint2
 unsigned int HaveKeys(const vector<valtype>& pubkeys, const CKeyStore& keystore)
 {
     unsigned int nResult = 0;
-    BOOST_FOREACH(const valtype& pubkey, pubkeys)
+    for (const valtype& pubkey : pubkeys)
     {
         CKeyID keyID = CPubKey(pubkey).GetID();
         if (keystore.HaveKey(keyID))
@@ -207,7 +207,7 @@ bool VerifyScript(const CScript& scriptSig, const uint160& pubKey, const CTransa
     //cout << "Tx Hash: " << hash.GetHex() << endl;
     //cout << "Key: " << pubKey.GetHex() << endl;
     bool found=false;
-    BOOST_FOREACH(const CTxIn &txin, txTo.vin){
+    for (const CTxIn &txin : txTo.vin){
 	if(txin.pubKey!=pubKey)
 	    continue;
 #if 0
@@ -306,7 +306,7 @@ bool SignSignature(const CKeyStore &keystore, uint160 pubKey, CTransaction& txTo
     uint256 hash = SignatureHash(txTo);
     //cout << "Tx Hash: " << hash.GetHex() << endl;
     //cout << "Key: " << pubKey.GetHex() << endl;
-    BOOST_FOREACH(CTxIn &txin, txTo.vin){
+    for (CTxIn &txin : txTo.vin){
 	if(txin.pubKey!=pubKey)
 	    continue;
 	txin.scriptSig.push_back(1);
@@ -320,7 +320,7 @@ void CScript::SetMultisig(int nRequired, const std::vector<CPubKey>& keys)
     this->clear();
 
     *this << EncodeOP_N(nRequired);
-    BOOST_FOREACH(const CPubKey& key, keys)
+    for (const CPubKey& key : keys)
         *this << key;
     *this << EncodeOP_N(keys.size()) << OP_CHECKMULTISIG;
 #else

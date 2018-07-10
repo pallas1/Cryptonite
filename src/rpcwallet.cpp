@@ -58,7 +58,7 @@ void WalletTxToJSON(const CWalletTx& wtx, Object& entry)
     entry.push_back(Pair("timereceived", (boost::int64_t)wtx.nTimeReceived));
     entry.push_back(Pair("lockheight", wtx.nLockHeight));
     entry.push_back(Pair("msg", string(wtx.msg.begin(),wtx.msg.end())));
-    BOOST_FOREACH(const PAIRTYPE(string,string)& item, wtx.mapValue)
+    for (const PAIRTYPE(string,string)& item : wtx.mapValue)
         entry.push_back(Pair(item.first, item.second));
 }
 
@@ -245,7 +245,7 @@ Value getaddressesbyaccount(const Array& params, bool fHelp)
 
     // Find all addresses that have the given account
     Array ret;
-    BOOST_FOREACH(const PAIRTYPE(CBitcoinAddress, CAddressBookData)& item, pwalletMain->mapAddressBook)
+    for (const PAIRTYPE(CBitcoinAddress, CAddressBookData)& item : pwalletMain->mapAddressBook)
     {
         const CBitcoinAddress& address = item.first;
         const string& strName = item.second.name;
@@ -375,10 +375,10 @@ Value listaddressgroupings(const Array& params, bool fHelp)
 
     Array jsonGroupings;
     map<CTxDestination, uint64_t> balances = pwalletMain->GetAddressBalances();
-    BOOST_FOREACH(set<CTxDestination> grouping, pwalletMain->GetAddressGroupings())
+    for (set<CTxDestination> grouping : pwalletMain->GetAddressGroupings())
     {
         Array jsonGrouping;
-        BOOST_FOREACH(CTxDestination address, grouping)
+        for (CTxDestination address : grouping)
         {
             Array addressInfo;
             addressInfo.push_back(CBitcoinAddress(address).ToString());
@@ -497,7 +497,7 @@ Value getreceivedbyaddress(const Array& params, bool fHelp)
 		if (nDepth < nMinDepth)
 			continue;
 
-        BOOST_FOREACH(const CTxOut& txout, wtx.vout)
+        for (const CTxOut& txout : wtx.vout)
         {
             if (keyID == CKeyID(txout.pubKey))
             	nAmount += txout.nValue;
@@ -551,7 +551,7 @@ Value getreceivedbyaccount(const Array& params, bool fHelp)
 		if (nDepth < nMinDepth)
 			continue;
 
-        BOOST_FOREACH(const CTxOut& txout, wtx.vout)
+        for (const CTxOut& txout : wtx.vout)
         {
         	CTxDestination address = CKeyID(txout.pubKey);
 
@@ -571,7 +571,7 @@ uint64_t GetAccountBalance(CWalletDB& walletdb, const string& strAccount, int nM
     pviewTip->ConservativeBalances(nMinDepth, keys, balances);
 
     uint64_t nBalance=0;
-    BOOST_FOREACH(CActInfo v, balances)
+    for (CActInfo v : balances)
 	nBalance += v.balance;
     return nBalance;
 }
@@ -628,7 +628,7 @@ Value getbalance(const Array& params, bool fHelp)
 	pviewTip->ConservativeBalances(nMinDepth, keys, balances);
 
 	uint64_t nBalance=0;
-	BOOST_FOREACH(CActInfo v, balances)
+	for (CActInfo v : balances)
             nBalance += v.balance;
         return  ValueFromAmount(nBalance);
     }
@@ -818,7 +818,7 @@ Value sendmany(const Array& params, bool fHelp)
     map<CKeyID, int64_t> mapSend;
 
     uint64_t totalAmount = 0;
-    BOOST_FOREACH(const Pair& s, sendTo)
+    for (const Pair& s : sendTo)
     {
         CBitcoinAddress address(s.name_);
         if (!address.IsValid())
@@ -932,7 +932,7 @@ Value ListReceived(const Array& params, bool fByAccounts)
         if (nDepth < nMinDepth)
             continue;
 
-        BOOST_FOREACH(const CTxOut& txout, wtx.vout)
+        for (const CTxOut& txout : wtx.vout)
         {
             CTxDestination address = CKeyID(txout.pubKey);
             if (!pwalletMain->IsMine(txout.pubKey))
@@ -948,7 +948,7 @@ Value ListReceived(const Array& params, bool fByAccounts)
     // Reply
     Array ret;
     map<string, tallyitem> mapAccountTally;
-    BOOST_FOREACH(const PAIRTYPE(CBitcoinAddress, CAddressBookData)& item, pwalletMain->mapAddressBook)
+    for (const PAIRTYPE(CBitcoinAddress, CAddressBookData)& item : pwalletMain->mapAddressBook)
     {
         const CBitcoinAddress& address = item.first;
         const string& strAccount = item.second.name;
@@ -980,7 +980,7 @@ Value ListReceived(const Array& params, bool fByAccounts)
             Array transactions;
             if (it != mapTally.end())
             {
-                BOOST_FOREACH(const uint256& item, (*it).second.txids)
+                for (const uint256& item : (*it).second.txids)
                 {
                     transactions.push_back(item.GetHex());
                 }
@@ -1087,7 +1087,7 @@ void ListTransactions(const CWalletTx& wtx, const string& strAccount, int nMinDe
     // Sent
     if ((!listSent.empty() || nFee != 0) && (fAllAccounts || strAccount == strSentAccount))
     {
-        BOOST_FOREACH(const PAIRTYPE(CTxDestination, int64_t)& s, listSent)
+        for (const PAIRTYPE(CTxDestination, int64_t)& s : listSent)
         {
             Object entry;
             entry.push_back(Pair("account", strSentAccount));
@@ -1104,7 +1104,7 @@ void ListTransactions(const CWalletTx& wtx, const string& strAccount, int nMinDe
     // Received
     if (listReceived.size() > 0 && GetDepthInMainChain(wtx.GetTxID()) >= nMinDepth)
     {
-        BOOST_FOREACH(const PAIRTYPE(CTxDestination, int64_t)& r, listReceived)
+        for (const PAIRTYPE(CTxDestination, int64_t)& r : listReceived)
         {
             string account;
             if (pwalletMain->mapAddressBook.count(r.first))
@@ -1288,7 +1288,7 @@ Value listaccounts(const Array& params, bool fHelp)
         nMinDepth = params[0].get_int();
 
     map<string, int64_t> mapAccountBalances;
-    BOOST_FOREACH(const PAIRTYPE(CTxDestination, CAddressBookData)& entry, pwalletMain->mapAddressBook) {
+    for (const PAIRTYPE(CTxDestination, CAddressBookData)& entry : pwalletMain->mapAddressBook) {
         if (pwalletMain->IsMine(boost::get<CKeyID>(entry.first))) // This address belongs to me
             mapAccountBalances[entry.second.name] = 0;
     }
@@ -1306,11 +1306,11 @@ Value listaccounts(const Array& params, bool fHelp)
             continue;
         wtx.GetAmounts(listReceived, listSent, nFee, strSentAccount);
         mapAccountBalances[strSentAccount] -= nFee;
-        BOOST_FOREACH(const PAIRTYPE(CTxDestination, int64_t)& s, listSent)
+        for (const PAIRTYPE(CTxDestination, int64_t)& s : listSent)
             mapAccountBalances[strSentAccount] -= s.second;
         if (nDepth >= nMinDepth)
         {
-            BOOST_FOREACH(const PAIRTYPE(CTxDestination, int64_t)& r, listReceived)
+            for (const PAIRTYPE(CTxDestination, int64_t)& r : listReceived)
                 if (pwalletMain->mapAddressBook.count(r.first))
                     mapAccountBalances[pwalletMain->mapAddressBook[r.first].name] += r.second;
                 else
@@ -1320,11 +1320,11 @@ Value listaccounts(const Array& params, bool fHelp)
 
     list<CAccountingEntry> acentries;
     CWalletDB(pwalletMain->strWalletFile).ListAccountCreditDebit("*", acentries);
-    BOOST_FOREACH(const CAccountingEntry& entry, acentries)
+    for (const CAccountingEntry& entry : acentries)
         mapAccountBalances[entry.strAccount] += entry.nCreditDebit;
 
     Object ret;
-    BOOST_FOREACH(const PAIRTYPE(string, int64_t)& accountBalance, mapAccountBalances) {
+    for (const PAIRTYPE(string, int64_t)& accountBalance : mapAccountBalances) {
         ret.push_back(Pair(accountBalance.first, ValueFromAmount(accountBalance.second)));
     }
     return ret;

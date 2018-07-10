@@ -50,10 +50,10 @@ bool TrieSync::CanSync(){
 
 void TrieSync::Reset(){
     LOCK(cs_main);
-    BOOST_FOREACH(PAIRTYPE(CBlockIndex*,CSlice*) pair, slices){
+    for (PAIRTYPE(CBlockIndex*,CSlice*) pair : slices){
 	delete pair.second;
     }
-    BOOST_FOREACH(PAIRTYPE(CBlockIndex*,CSlice*) pair, slicesRequested){
+    for (PAIRTYPE(CBlockIndex*,CSlice*) pair : slicesRequested){
 	delete pair.second;
     }
     slices.clear();
@@ -64,7 +64,7 @@ void TrieSync::Reset(){
 //Remove any slices which are no longer tennable
 void TrieSync::Update(){
     LOCK(cs_main);
-    BOOST_FOREACH(PAIRTYPE(CBlockIndex*,CSlice*) pair, slices){
+    for (PAIRTYPE(CBlockIndex*,CSlice*) pair : slices){
 	if(chainHeaders.Contains(pair.first) && (chainHeaders.Height() - pair.first->nHeight) >= (int64_t)MIN_HISTORY){
    	    //Slices are also no good if any tx data is missing between them and tip
     	    CBlockIndex *pindex = chainHeaders.Tip();
@@ -105,7 +105,7 @@ void TrieSync::AbortSlice(CSlice slice, bool tooBig, set<NodeId> cnodes, NodeId 
 
     //See if all of cnodes is in nodestoobig
     bool notfound=false;
-    BOOST_FOREACH(NodeId tid, cnodes){
+    for (NodeId tid : cnodes){
 	if(!nodesTooBig.count(tid)){
 	    notfound=true;
 	    break;
@@ -184,7 +184,7 @@ int TrieSync::GetProgress(){
     GetIntervals(slices,intervals); 
 
     uint160 total=0;
-    BOOST_FOREACH(CInterval i, intervals){
+    for (CInterval i : intervals){
 	total += i.right - i.left;
     }
 
@@ -220,7 +220,7 @@ void TrieSync::GetIntervals(multimap<CBlockIndex*,CSlice*> &slices, list<CInterv
     //or have already been fetched
 
     int k=0;
-    BOOST_FOREACH(PAIRTYPE(CBlockIndex*,CSlice*) pair, slices){
+    for (PAIRTYPE(CBlockIndex*,CSlice*) pair : slices){
 	CSlice *pslice = pair.second;
 	intervals.push_back(CInterval(pslice->m_left,pslice->m_right));
 	printf("__INTERVAL%d:  %s - %s\n",k ,pslice->m_left.GetHex().c_str() ,pslice->m_right.GetHex().c_str());
@@ -253,7 +253,7 @@ void TrieSync::GetIntervals(multimap<CBlockIndex*,CSlice*> &slices, list<CInterv
 
 
      k=0;
-    BOOST_FOREACH(CInterval i, intervals){
+    for (CInterval i : intervals){
         printf("INTERVAL%d:  %s - %s\n",k ,i.left.GetHex().c_str() ,i.right.GetHex().c_str());
 	k++;
     }
@@ -324,7 +324,7 @@ bool TrieSync::ReadyToBuild(){
     bool progress=true;
     while(progress){
  	progress=false;
-    	BOOST_FOREACH(PAIRTYPE(CBlockIndex*,CSlice*) pair, slices){
+    	for (PAIRTYPE(CBlockIndex*,CSlice*) pair : slices){
 	    CSlice *pslice = pair.second;
 	    if(pslice->m_left <= (left_required + 1) && pslice->m_right > left_required){
 		left_required = pslice->m_right;
@@ -350,8 +350,8 @@ bool TrieSync::ReadyToBuild(){
 //TODO: all wrong
 void TrieSync::ApplyTransactions(map<uint160, AccountData> &data, CBlock &block){
     //Txout first
-    BOOST_FOREACH(CTransaction tx, block.vtx){
-	BOOST_FOREACH(CTxOut txout, tx.vout){   
+    for (CTransaction tx : block.vtx){
+	for (CTxOut txout : tx.vout){   
 	    AccountData ad; 
 	    if(data.find(txout.pubKey)!=data.end())
 		ad = data[txout.pubKey];
@@ -363,8 +363,8 @@ void TrieSync::ApplyTransactions(map<uint160, AccountData> &data, CBlock &block)
 	}
     }
 
-    BOOST_FOREACH(CTransaction tx, block.vtx){
-	BOOST_FOREACH(CTxIn txin, tx.vin){   
+    for (CTransaction tx : block.vtx){
+	for (CTxIn txin : tx.vin){   
 	    if(data.find(txin.pubKey)==data.end())
 		continue; //Account not in slices yet, no worries
 	    AccountData ad = data[txin.pubKey]; 
@@ -402,7 +402,7 @@ TrieNode* TrieSync::Build(uint256 &block){
 
     uint64_t last_height = 0;
     map<uint160, AccountData> data;
-    BOOST_FOREACH(PAIRTYPE(CBlockIndex*,CSlice*) pair, slicev){
+    for (PAIRTYPE(CBlockIndex*,CSlice*) pair : slicev){
 	CSlice *slice=pair.second;
 	if(last_height != 0){
 	    for(uint64_t nHeight=last_height; nHeight <= (uint64_t)pair.first->nHeight; nHeight++){
@@ -418,7 +418,7 @@ TrieNode* TrieSync::Build(uint256 &block){
 	trie->FindAll(NODE_LEAF,&leaves);
 
 	//If a newer slice has a dup entry it doesn't matter. Just overwrite
-	BOOST_FOREACH(TrieNode* leaf, leaves){
+	for (TrieNode* leaf : leaves){
 	    data[leaf->Key()] = *leaf;
 	}
 	delete trie;
@@ -428,7 +428,7 @@ TrieNode* TrieSync::Build(uint256 &block){
 
     //List ready for construction
     TrieNode* root=0;
-    BOOST_FOREACH(PAIRTYPE(uint160,AccountData) pair, data){
+    for (PAIRTYPE(uint160,AccountData) pair : data){
 	AccountData ad=pair.second;
 	TrieNode *node = new TrieNode(NODE_LEAF);
 	*((AccountData*)node) = ad;

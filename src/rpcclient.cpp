@@ -125,7 +125,7 @@ void ConvertTo(Value& value, bool fAllowNull=false)
 Array RPCConvertValues(const std::string &strMethod, const std::vector<std::string> &strParams)
 {
     Array params;
-    BOOST_FOREACH(const std::string &param, strParams)
+    for (const std::string &param : strParams)
         params.push_back(param);
 
     int n = params.size();
