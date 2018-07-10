@@ -57,6 +57,7 @@ BITCOIN_CORE_H = \
   rpcclient.h \
   rpcprotocol.h \
   rpcserver.h \
+  scheduler.h \
   script.h \
   serialize.h \
   sync.h \
@@ -137,6 +138,7 @@ libcryptonite_common_a_SOURCES = \
   netbase.cpp \
   protocol.cpp \
   rpcprotocol.cpp \
+  scheduler.cpp \
   script.cpp \
   sync.cpp \
   util.cpp \

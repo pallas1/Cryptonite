@@ -13,6 +13,7 @@
 #include "addrman.h"
 #include "chainparams.h"
 #include "core.h"
+#include "scheduler.h"
 #include "ui_interface.h"
 
 #ifdef WIN32
@@ -1736,7 +1737,7 @@ void static Discover(boost::thread_group& threadGroup)
         threadGroup.create_thread(boost::bind(&TraceThread<void (*)()>, "ext-ip", &ThreadGetMyExternalIP));
 }
 
-void StartNode(boost::thread_group& threadGroup)
+void StartNode(boost::thread_group& threadGroup, CScheduler& scheduler)
 {
     if (semOutbound == NULL) {
         // initialize semaphore
@@ -1776,7 +1777,7 @@ void StartNode(boost::thread_group& threadGroup)
     threadGroup.create_thread(boost::bind(&TraceThread<void (*)()>, "msghand", &ThreadMessageHandler));
 
     // Dump network addresses
-    threadGroup.create_thread(boost::bind(&LoopForever<void (*)()>, "dumpaddr", &DumpAddresses, DUMP_ADDRESSES_INTERVAL * 1000));
+    scheduler.scheduleEvery(&DumpAddresses, DUMP_ADDRESSES_INTERVAL * 1000);
 }
 
 bool StopNode()
