@@ -8,6 +8,7 @@
 #include "core.h"
 #include "main.h"
 #include "net.h"
+#include "util.h"
 #ifdef ENABLE_WALLET
 #include "wallet.h"
 #endif
@@ -555,7 +556,7 @@ void GenerateBitcoins(bool fGenerate, CWallet* pwallet, int nThreads)
         if (Params().NetworkID() == CChainParams::REGTEST)
             nThreads = 1;
         else
-            nThreads = boost::thread::hardware_concurrency();
+            nThreads = GetNumCores();
     }
 
     if (minerThreads != NULL)

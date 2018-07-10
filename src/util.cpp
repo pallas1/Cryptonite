@@ -29,6 +29,7 @@
 
 #include <algorithm>
 #include <fcntl.h>
+#include <sched.h>
 #include <sys/resource.h>
 #include <sys/stat.h>
 
@@ -70,6 +71,7 @@
 #include <boost/program_options/parsers.hpp>
 #include <openssl/crypto.h>
 #include <openssl/rand.h>
+#include <thread>
 
 // Work around clang compilation problem in Boost 1.46:
 // /usr/include/boost/program_options/detail/config_file.hpp:163:17: error: call to function 'to_internal' that is neither visible in the template definition nor found by argument-dependent lookup
@@ -1412,6 +1414,25 @@ void RenameThread(const char* name)
 #else
     // Prevent warnings for unused parameters...
     (void)name;
+#endif
+}
+
+int GetNumCores()
+{
+    return std::thread::hardware_concurrency();
+}
+
+int ScheduleBatchPriority(void)
+{
+#ifdef SCHED_BATCH
+    const static sched_param param{0};
+    if (int ret = pthread_setschedparam(pthread_self(), SCHED_BATCH, &param)) {
+        LogPrintf("Failed to pthread_setschedparam: %s\n", strerror(errno));
+        return ret;
+    }
+    return 0;
+#else
+    return 1;
 #endif
 }
 

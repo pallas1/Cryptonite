@@ -527,6 +527,12 @@ inline void SetThreadPriority(int nPriority)
 }
 #endif
 
+ /**
+ * Return the number of cores available on the current system.
+ * @note This includes virtual cores, such as those provided by HyperThreading.
+ */
+int GetNumCores();
+
 void RenameThread(const char* name);
 
 inline uint32_t ByteReverse(uint32_t value)
@@ -560,5 +566,14 @@ template <typename Callable> void TraceThread(const char* name,  Callable func)
         throw;
     }
 }
+
+ /**
+ * On platforms that support it, tell the kernel the calling thread is
+ * CPU-intensive and non-interactive. See SCHED_BATCH in sched(7) for details.
+ *
+ * @return The return value of sched_setschedule(), or 1 on systems without
+ * sched_setchedule().
+ */
+int ScheduleBatchPriority(void);
 
 #endif
