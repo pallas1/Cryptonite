@@ -54,6 +54,7 @@ BITCOIN_CORE_H = \
   net.h \
   noui.h \
   protocol.h \
+  reverse_iterator.h \
   rpcclient.h \
   rpcprotocol.h \
   rpcserver.h \

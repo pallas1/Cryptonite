@@ -13,7 +13,6 @@
 #include "uint256.h"
 #include "util.h"
 
-#include <boost/foreach.hpp>
 #include <boost/test/unit_test.hpp>
 #include "json/json_spirit_reader_template.h"
 #include "json/json_spirit_utils.h"

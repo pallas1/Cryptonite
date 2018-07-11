@@ -6,7 +6,6 @@
 
 #include "util.h"
 
-#include <boost/foreach.hpp>
 
 #ifdef DEBUG_LOCKCONTENTION
 void PrintLockContention(const char* pszName, const char* pszFile, int nLine)

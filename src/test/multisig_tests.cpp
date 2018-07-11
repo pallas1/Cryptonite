@@ -9,7 +9,6 @@
 #include "uint256.h"
 
 #include <boost/assign/std/vector.hpp>
-#include <boost/foreach.hpp>
 #include <boost/test/unit_test.hpp>
 
 using namespace std;

@@ -13,7 +13,6 @@
 #include "data/sig_noncanonical.json.h"
 #include "data/sig_canonical.json.h"
 
-#include <boost/foreach.hpp>
 #include <boost/test/unit_test.hpp>
 #include "json/json_spirit_writer_template.h"
 #include <openssl/ecdsa.h>

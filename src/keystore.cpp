@@ -9,7 +9,6 @@
 #include "key.h"
 #include "script.h"
 
-#include <boost/foreach.hpp>
 
 bool CKeyStore::GetPubKey(const CKeyID &address, CPubKey &vchPubKeyOut) const
 {

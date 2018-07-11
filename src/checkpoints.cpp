@@ -6,12 +6,12 @@
 #include "checkpoints.h"
 
 #include "main.h"
+#include "reverse_iterator.h"
 #include "uint256.h"
 
 #include <stdint.h>
 
 #include <boost/assign/list_of.hpp> // for 'map_list_of()'
-#include <boost/foreach.hpp>
 
 namespace Checkpoints
 {
@@ -131,7 +131,7 @@ namespace Checkpoints
 
         const MapCheckpoints& checkpoints = *Checkpoints().mapCheckpoints;
 
-        BOOST_REVERSE_FOREACH(const MapCheckpoints::value_type& i, checkpoints)
+        for (const MapCheckpoints::value_type& i : reverse_iterate(checkpoints))
         {
             const uint256& hash = i.second;
             std::map<uint256, CBlockIndex*>::const_iterator t = mapBlockIndex.find(hash);

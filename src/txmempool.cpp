@@ -6,6 +6,7 @@
 
 #include "main.h"
 #include "core.h"
+#include "reverse_iterator.h"
 #include "txmempool.h"
 
 using namespace std;
