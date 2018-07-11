@@ -12,7 +12,6 @@
 //#define BOOST_SPIRIT_THREADSAFE  // uncomment for multithreaded use, requires linking to boost.thread
 
 #include <boost/bind.hpp>
-#include <boost/function.hpp>
 #include <boost/version.hpp>
 
 #if BOOST_VERSION >= 103800
@@ -422,11 +421,11 @@ namespace json_spirit
                 // first we convert the semantic action class methods to functors with the 
                 // parameter signature expected by spirit
 
-                typedef boost::function< void( Char_type )            > Char_action;
-                typedef boost::function< void( Iter_type, Iter_type ) > Str_action;
-                typedef boost::function< void( double )               > Real_action;
-                typedef boost::function< void( boost::int64_t )       > Int_action;
-                typedef boost::function< void( boost::uint64_t )      > Uint64_action;
+                typedef std::function< void( Char_type )            > Char_action;
+                typedef std::function< void( Iter_type, Iter_type ) > Str_action;
+                typedef std::function< void( double )               > Real_action;
+                typedef std::function< void( boost::int64_t )       > Int_action;
+                typedef std::function< void( boost::uint64_t )      > Uint64_action;
 
                 Char_action   begin_obj  ( boost::bind( &Semantic_actions_t::begin_obj,   &self.actions_, _1 ) );
                 Char_action   end_obj    ( boost::bind( &Semantic_actions_t::end_obj,     &self.actions_, _1 ) );

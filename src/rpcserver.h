@@ -51,7 +51,7 @@ void RPCTypeCheck(const json_spirit::Object& o,
   Run func nSeconds from now. Uses boost deadline timers.
   Overrides previous timer <name> (if any).
  */
-void RPCRunLater(const std::string& name, boost::function<void(void)> func, int64_t nSeconds);
+void RPCRunLater(const std::string& name, std::function<void(void)> func, int64_t nSeconds);
 
 typedef json_spirit::Value(*rpcfn_type)(const json_spirit::Array& params, bool fHelp);
 
