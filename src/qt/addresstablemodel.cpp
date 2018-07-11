@@ -79,7 +79,7 @@ public:
         cachedAddressTable.clear();
         {
             LOCK(wallet->cs_wallet);
-            for (const PAIRTYPE(CTxDestination, CAddressBookData)& item : wallet->mapAddressBook)
+            for (const std::pair<CTxDestination, CAddressBookData>& item : wallet->mapAddressBook)
             {
                 const CBitcoinAddress& address = item.first;
                 bool fMine = wallet->IsMine(boost::get<CKeyID>(address.Get()));

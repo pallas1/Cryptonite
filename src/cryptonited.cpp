@@ -57,7 +57,7 @@ bool AppInit(int argc, char* argv[])
 {
     boost::thread_group threadGroup;
     CScheduler scheduler;
-    boost::thread* detectShutdownThread = NULL;
+    boost::thread* detectShutdownThread = nullptr;
 
     bool fRet = false;
     try
@@ -147,7 +147,7 @@ bool AppInit(int argc, char* argv[])
     catch (std::exception& e) {
         PrintExceptionContinue(&e, "AppInit()");
     } catch (...) {
-        PrintExceptionContinue(NULL, "AppInit()");
+        PrintExceptionContinue(nullptr, "AppInit()");
     }
 
     if (!fRet)
@@ -165,7 +165,7 @@ bool AppInit(int argc, char* argv[])
     {
         detectShutdownThread->join();
         delete detectShutdownThread;
-        detectShutdownThread = NULL;
+        detectShutdownThread = nullptr;
     }
     Shutdown();
 

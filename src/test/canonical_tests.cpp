@@ -33,13 +33,13 @@ bool static IsCanonicalSignature_OpenSSL_inner(const std::vector<unsigned char>&
     if (vchSig.size() == 0)
         return false;
     const unsigned char *input = &vchSig[0];
-    ECDSA_SIG *psig = NULL;
+    ECDSA_SIG *psig = nullptr;
     d2i_ECDSA_SIG(&psig, &input, vchSig.size());
-    if (psig == NULL)
+    if (psig == nullptr)
         return false;
     unsigned char buf[256];
     unsigned char *pbuf = buf;
-    unsigned int nLen = i2d_ECDSA_SIG(psig, NULL);
+    unsigned int nLen = i2d_ECDSA_SIG(psig, nullptr);
     if (nLen != vchSig.size()) {
         ECDSA_SIG_free(psig);
         return false;

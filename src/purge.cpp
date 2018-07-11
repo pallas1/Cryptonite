@@ -58,7 +58,7 @@ void PurgeDB(){
     //block and undo files to undeletable
 
     //mapBlockIndex contains all blocks, so we can read those for info
-    for (PAIRTYPE(uint256, CBlockIndex*) item : mapBlockIndex){
+    for (std::pair<uint256, CBlockIndex*> item : mapBlockIndex){
 	CBlockIndex *pindex = item.second;	
 	if(pindex->nHeight + MIN_HISTORY >= chainActive.Height()){
 	    //Block cannot be deleted
@@ -68,7 +68,7 @@ void PurgeDB(){
     }
 
     //Second pass, locate all blocks that can have transactions deleted from txindex
-    for (PAIRTYPE(uint256, CBlockIndex*) item : mapBlockIndex){
+    for (std::pair<uint256, CBlockIndex*> item : mapBlockIndex){
 	CBlockIndex *pindex = item.second;	
 	if(pindex->nHeight + MIN_HISTORY < chainActive.Height()){
 	    //Block can be deleted

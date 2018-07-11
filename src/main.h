@@ -135,7 +135,7 @@ void UnregisterWallet(CWalletInterface* pwalletIn);
 /** Unregister all wallets from core */
 void UnregisterAllWallets();
 /** Push an updated transaction to all registered wallets */
-void SyncWithWallets(const uint256 &hash, const CTransaction& tx, const CBlock* pblock = NULL);
+void SyncWithWallets(const uint256 &hash, const CTransaction& tx, const CBlock* pblock = nullptr);
 
 /** Register with a network node to receive its signals */
 void RegisterNodeSignals(CNodeSignals& nodeSignals);
@@ -155,7 +155,7 @@ FILE* OpenBlockFile(const CDiskBlockPos &pos, bool fReadOnly = false);
 /** Open an undo file (rev?????.dat) */
 FILE* OpenUndoFile(const CDiskBlockPos &pos, bool fReadOnly = false);
 /** Import blocks from an external file */
-bool LoadExternalBlockFile(FILE* fileIn, CDiskBlockPos *dbp = NULL);
+bool LoadExternalBlockFile(FILE* fileIn, CDiskBlockPos *dbp = nullptr);
 /** Initialize a new block tree database + block data on disk */
 bool InitBlockIndex();
 /** Load the block tree and coins database from disk */
@@ -328,7 +328,7 @@ inline bool AllowFree(double dPriority)
 }
 
 // Check whether all inputs of this transaction are valid (no double spends, scripts & sigs, amounts)
-// This does not modify the UTXO set. If pvChecks is not NULL, script checks are pushed onto it
+// This does not modify the UTXO set. If pvChecks is not nullptr, script checks are pushed onto it
 // instead of being performed inline.
 bool CheckInputs(const CTransaction& tx, CValidationState &state);
 
@@ -626,8 +626,8 @@ public:
 
     CBlockIndex()
     {
-        phashBlock = NULL;
-        pprev = NULL;
+        phashBlock = nullptr;
+        pprev = nullptr;
         nHeight = 0;
         nFile = 0;
         nDataPos = 0;
@@ -649,8 +649,8 @@ public:
 
     CBlockIndex(const CBlockHeader& block)
     {
-        phashBlock = NULL;
-        pprev = NULL;
+        phashBlock = nullptr;
+        pprev = nullptr;
         nHeight = 0;
         nFile = 0;
         nDataPos = 0;
@@ -925,20 +925,20 @@ private:
     std::vector<CBlockIndex*> vChain;
 
 public:
-    /** Returns the index entry for the genesis block of this chain, or NULL if none. */
+    /** Returns the index entry for the genesis block of this chain, or nullptr if none. */
     CBlockIndex *Genesis() const {
-        return vChain.size() > 0 ? vChain[0] : NULL;
+        return vChain.size() > 0 ? vChain[0] : nullptr;
     }
 
-    /** Returns the index entry for the tip of this chain, or NULL if none. */
+    /** Returns the index entry for the tip of this chain, or nullptr if none. */
     CBlockIndex *Tip() const {
-        return vChain.size() > 0 ? vChain[vChain.size() - 1] : NULL;
+        return vChain.size() > 0 ? vChain[vChain.size() - 1] : nullptr;
     }
 
-    /** Returns the index entry at a particular height in this chain, or NULL if no such height exists. */
+    /** Returns the index entry at a particular height in this chain, or nullptr if no such height exists. */
     CBlockIndex *operator[](int nHeight) const {
         if (nHeight < 0 || nHeight >= (int)vChain.size())
-            return NULL;
+            return nullptr;
         return vChain[nHeight];
     }
 
@@ -958,12 +958,12 @@ public:
 	return(!Contains(pindex));
     }
 
-    /** Find the successor of a block in this chain, or NULL if the given index is not found or is the tip. */
+    /** Find the successor of a block in this chain, or nullptr if the given index is not found or is the tip. */
     CBlockIndex *Next(const CBlockIndex *pindex) const {
         if (Contains(pindex))
             return (*this)[pindex->nHeight + 1];
         else
-            return NULL;
+            return nullptr;
     }
 
     /** Return the maximal height in the chain. Is equal to chain.Tip() ? chain.Tip()->nHeight : -1. */
@@ -975,7 +975,7 @@ public:
     CBlockIndex *SetTip(CBlockIndex *pindex);
 
     /** Return a CBlockLocator that refers to a block in this chain (by default the tip). */
-    CBlockLocator GetLocator(const CBlockIndex *pindex = NULL) const;
+    CBlockLocator GetLocator(const CBlockIndex *pindex = nullptr) const;
 
     /** Find the last common block between this chain and a locator. */
     CBlockIndex *FindFork(const CBlockLocator &locator) const;

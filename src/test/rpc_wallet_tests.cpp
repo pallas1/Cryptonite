@@ -14,7 +14,7 @@
 using namespace std;
 using namespace json_spirit;
 
-extern Array createArgs(int nRequired, const char* address1=NULL, const char* address2=NULL);
+extern Array createArgs(int nRequired, const char* address1=nullptr, const char* address2=nullptr);
 extern Value CallRPC(string args);
 
 extern CWallet* pwalletMain;

@@ -45,7 +45,7 @@ const struct {
     {"cmd-reply", ":/icons/tx_output"},
     {"cmd-error", ":/icons/tx_output"},
     {"misc", ":/icons/tx_inout"},
-    {NULL, NULL}
+    {nullptr, nullptr}
 };
 
 /* Object for executing console RPC commands in a separate thread.
@@ -542,7 +542,7 @@ void RPCConsole::peerSelected(const QItemSelection &selected, const QItemSelecti
 
 void RPCConsole::peerLayoutChanged()
 {
-    const CNodeCombinedStats *stats = NULL;
+    const CNodeCombinedStats *stats = nullptr;
     bool fUnselect = false, fReselect = false, fDisconnected = false;
 
     if (detailNodeStats.nodestats.nodeid == -1)

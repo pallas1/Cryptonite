@@ -50,10 +50,10 @@ bool TrieSync::CanSync(){
 
 void TrieSync::Reset(){
     LOCK(cs_main);
-    for (PAIRTYPE(CBlockIndex*,CSlice*) pair : slices){
+    for (std::pair<CBlockIndex*,CSlice*> pair : slices){
 	delete pair.second;
     }
-    for (PAIRTYPE(CBlockIndex*,CSlice*) pair : slicesRequested){
+    for (std::pair<CBlockIndex*,CSlice*> pair : slicesRequested){
 	delete pair.second;
     }
     slices.clear();
@@ -64,7 +64,7 @@ void TrieSync::Reset(){
 //Remove any slices which are no longer tennable
 void TrieSync::Update(){
     LOCK(cs_main);
-    for (PAIRTYPE(CBlockIndex*,CSlice*) pair : slices){
+    for (std::pair<CBlockIndex*,CSlice*> pair : slices){
 	if(chainHeaders.Contains(pair.first) && (chainHeaders.Height() - pair.first->nHeight) >= (int64_t)MIN_HISTORY){
    	    //Slices are also no good if any tx data is missing between them and tip
     	    CBlockIndex *pindex = chainHeaders.Tip();
@@ -220,7 +220,7 @@ void TrieSync::GetIntervals(multimap<CBlockIndex*,CSlice*> &slices, list<CInterv
     //or have already been fetched
 
     int k=0;
-    for (PAIRTYPE(CBlockIndex*,CSlice*) pair : slices){
+    for (std::pair<CBlockIndex*,CSlice*> pair : slices){
 	CSlice *pslice = pair.second;
 	intervals.push_back(CInterval(pslice->m_left,pslice->m_right));
 	printf("__INTERVAL%d:  %s - %s\n",k ,pslice->m_left.GetHex().c_str() ,pslice->m_right.GetHex().c_str());
@@ -324,7 +324,7 @@ bool TrieSync::ReadyToBuild(){
     bool progress=true;
     while(progress){
  	progress=false;
-    	for (PAIRTYPE(CBlockIndex*,CSlice*) pair : slices){
+    	for (std::pair<CBlockIndex*,CSlice*> pair : slices){
 	    CSlice *pslice = pair.second;
 	    if(pslice->m_left <= (left_required + 1) && pslice->m_right > left_required){
 		left_required = pslice->m_right;
@@ -402,7 +402,7 @@ TrieNode* TrieSync::Build(uint256 &block){
 
     uint64_t last_height = 0;
     map<uint160, AccountData> data;
-    for (PAIRTYPE(CBlockIndex*,CSlice*) pair : slicev){
+    for (std::pair<CBlockIndex*,CSlice*> pair : slicev){
 	CSlice *slice=pair.second;
 	if(last_height != 0){
 	    for(uint64_t nHeight=last_height; nHeight <= (uint64_t)pair.first->nHeight; nHeight++){
@@ -428,7 +428,7 @@ TrieNode* TrieSync::Build(uint256 &block){
 
     //List ready for construction
     TrieNode* root=0;
-    for (PAIRTYPE(uint160,AccountData) pair : data){
+    for (std::pair<uint160,AccountData> pair : data){
 	AccountData ad=pair.second;
 	TrieNode *node = new TrieNode(NODE_LEAF);
 	*((AccountData*)node) = ad;

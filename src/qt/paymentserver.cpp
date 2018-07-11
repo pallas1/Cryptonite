@@ -52,13 +52,13 @@ const char* BITCOIN_REQUEST_MIMETYPE = "application/cryptonite-paymentrequest";
 const char* BITCOIN_PAYMENTACK_MIMETYPE = "application/cryptonite-paymentack";
 const char* BITCOIN_PAYMENTACK_CONTENTTYPE = "application/cryptonite-payment";
 
-X509_STORE* PaymentServer::certStore = NULL;
+X509_STORE* PaymentServer::certStore = nullptr;
 void PaymentServer::freeCertStore()
 {
-    if (PaymentServer::certStore != NULL)
+    if (PaymentServer::certStore != nullptr)
     {
         X509_STORE_free(PaymentServer::certStore);
-        PaymentServer::certStore = NULL;
+        PaymentServer::certStore = nullptr;
     }
 }
 
@@ -97,7 +97,7 @@ static void ReportInvalidCertificate(const QSslCertificate& cert)
 //
 void PaymentServer::LoadRootCAs(X509_STORE* _store)
 {
-    if (PaymentServer::certStore == NULL)
+    if (PaymentServer::certStore == nullptr)
         atexit(PaymentServer::freeCertStore);
     else
         freeCertStore();
@@ -329,7 +329,7 @@ void PaymentServer::initNetManager()
 {
     if (!optionsModel)
         return;
-    if (netManager != NULL)
+    if (netManager != nullptr)
         delete netManager;
 
     // netManager is used to fetch paymentrequests given in bitcoin: URIs
@@ -489,7 +489,7 @@ bool PaymentServer::processPaymentRequest(PaymentRequestPlus& request, SendCoins
     QList<std::pair<uint160, qint64> > sendingTos = request.getPayTo();
     QStringList addresses;
 
-    for (const PAIRTYPE(uint160, qint64)& sendingTo : sendingTos) {
+    for (const std::pair<uint160, qint64>& sendingTo : sendingTos) {
         // Extract and check destination addresses
         CTxDestination dest(CKeyID(sendingTo.first));
         // Append destination address

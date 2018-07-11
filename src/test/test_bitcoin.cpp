@@ -44,7 +44,7 @@ struct TestingSetup {
 	printf("Loaded\n");
         // If the loaded chain has a wrong genesis, bail out immediately
         // (we're likely using a testnet datadir, or the other way around).
-        if (!mapBlockIndex.empty() && chainActive.Genesis() == NULL)
+        if (!mapBlockIndex.empty() && chainActive.Genesis() == nullptr)
         	printf("Incorrect or no genesis block found. Wrong datadir for network?");
         InitBlockIndex();
 	printf("Init Done\n");
@@ -66,7 +66,7 @@ struct TestingSetup {
         UnregisterNodeSignals(GetNodeSignals());
 #ifdef ENABLE_WALLET
         delete pwalletMain;
-        pwalletMain = NULL;
+        pwalletMain = nullptr;
 #endif
         delete pblocktree;
 	delete pviewTip;

@@ -436,9 +436,9 @@ typedef struct MDB_envinfo {
 
 	/** @brief Return the mdb library version information.
 	 *
-	 * @param[out] major if non-NULL, the library major version number is copied here
-	 * @param[out] minor if non-NULL, the library minor version number is copied here
-	 * @param[out] patch if non-NULL, the library patch version number is copied here
+	 * @param[out] major if non-nullptr, the library major version number is copied here
+	 * @param[out] minor if non-nullptr, the library minor version number is copied here
+	 * @param[out] patch if non-nullptr, the library patch version number is copied here
 	 * @retval "version string" The library version as a string
 	 */
 char *mdb_version(int *major, int *minor, int *patch);
@@ -843,7 +843,7 @@ int  mdb_env_set_assert(MDB_env *env, MDB_assert_func *func);
 	 * If #MDB_NOTLS is in use, this does not apply to read-only transactions.
 	 * @note Cursors may not span transactions.
 	 * @param[in] env An environment handle returned by #mdb_env_create()
-	 * @param[in] parent If this parameter is non-NULL, the new transaction
+	 * @param[in] parent If this parameter is non-nullptr, the new transaction
 	 * will be a nested transaction, with the transaction indicated by \b parent
 	 * as its parent. Transactions may be nested to any level. A parent
 	 * transaction and its cursors may not issue any other operations than
@@ -962,11 +962,11 @@ int  mdb_txn_renew(MDB_txn *txn);
 	 * must finish (either commit or abort) before any other transaction may
 	 * use this function.
 	 *
-	 * To use named databases (with name != NULL), #mdb_env_set_maxdbs()
+	 * To use named databases (with name != nullptr), #mdb_env_set_maxdbs()
 	 * must be called before opening the environment.
 	 * @param[in] txn A transaction handle returned by #mdb_txn_begin()
 	 * @param[in] name The name of the database to open. If only a single
-	 * 	database is needed in the environment, this value may be NULL.
+	 * 	database is needed in the environment, this value may be nullptr.
 	 * @param[in] flags Special options for this database. This parameter
 	 * must be set to 0 or by bitwise OR'ing together one or more of the
 	 * values described here.
@@ -1218,8 +1218,8 @@ int  mdb_put(MDB_txn *txn, MDB_dbi dbi, MDB_val *key, MDB_val *data,
 	 * If the database does not support sorted duplicate data items
 	 * (#MDB_DUPSORT) the data parameter is ignored.
 	 * If the database supports sorted duplicates and the data parameter
-	 * is NULL, all of the duplicate data items for the key will be
-	 * deleted. Otherwise, if the data parameter is non-NULL
+	 * is nullptr, all of the duplicate data items for the key will be
+	 * deleted. Otherwise, if the data parameter is non-nullptr
 	 * only the matching data item will be deleted.
 	 * This function will return #MDB_NOTFOUND if the specified key/data
 	 * pair is not in the database.

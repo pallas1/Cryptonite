@@ -58,7 +58,7 @@ void WalletTxToJSON(const CWalletTx& wtx, Object& entry)
     entry.push_back(Pair("timereceived", (boost::int64_t)wtx.nTimeReceived));
     entry.push_back(Pair("lockheight", wtx.nLockHeight));
     entry.push_back(Pair("msg", string(wtx.msg.begin(),wtx.msg.end())));
-    for (const PAIRTYPE(string,string)& item : wtx.mapValue)
+    for (const std::pair<string,string>& item : wtx.mapValue)
         entry.push_back(Pair(item.first, item.second));
 }
 
@@ -245,7 +245,7 @@ Value getaddressesbyaccount(const Array& params, bool fHelp)
 
     // Find all addresses that have the given account
     Array ret;
-    for (const PAIRTYPE(CBitcoinAddress, CAddressBookData)& item : pwalletMain->mapAddressBook)
+    for (const std::pair<CBitcoinAddress, CAddressBookData>& item : pwalletMain->mapAddressBook)
     {
         const CBitcoinAddress& address = item.first;
         const string& strName = item.second.name;
@@ -948,7 +948,7 @@ Value ListReceived(const Array& params, bool fByAccounts)
     // Reply
     Array ret;
     map<string, tallyitem> mapAccountTally;
-    for (const PAIRTYPE(CBitcoinAddress, CAddressBookData)& item : pwalletMain->mapAddressBook)
+    for (const std::pair<CBitcoinAddress, CAddressBookData>& item : pwalletMain->mapAddressBook)
     {
         const CBitcoinAddress& address = item.first;
         const string& strAccount = item.second.name;
@@ -1087,7 +1087,7 @@ void ListTransactions(const CWalletTx& wtx, const string& strAccount, int nMinDe
     // Sent
     if ((!listSent.empty() || nFee != 0) && (fAllAccounts || strAccount == strSentAccount))
     {
-        for (const PAIRTYPE(CTxDestination, int64_t)& s : listSent)
+        for (const std::pair<CTxDestination, int64_t>& s : listSent)
         {
             Object entry;
             entry.push_back(Pair("account", strSentAccount));
@@ -1104,7 +1104,7 @@ void ListTransactions(const CWalletTx& wtx, const string& strAccount, int nMinDe
     // Received
     if (listReceived.size() > 0 && GetDepthInMainChain(wtx.GetTxID()) >= nMinDepth)
     {
-        for (const PAIRTYPE(CTxDestination, int64_t)& r : listReceived)
+        for (const std::pair<CTxDestination, int64_t>& r : listReceived)
         {
             string account;
             if (pwalletMain->mapAddressBook.count(r.first))
@@ -1288,7 +1288,7 @@ Value listaccounts(const Array& params, bool fHelp)
         nMinDepth = params[0].get_int();
 
     map<string, int64_t> mapAccountBalances;
-    for (const PAIRTYPE(CTxDestination, CAddressBookData)& entry : pwalletMain->mapAddressBook) {
+    for (const std::pair<CTxDestination, CAddressBookData>& entry : pwalletMain->mapAddressBook) {
         if (pwalletMain->IsMine(boost::get<CKeyID>(entry.first))) // This address belongs to me
             mapAccountBalances[entry.second.name] = 0;
     }
@@ -1306,11 +1306,11 @@ Value listaccounts(const Array& params, bool fHelp)
             continue;
         wtx.GetAmounts(listReceived, listSent, nFee, strSentAccount);
         mapAccountBalances[strSentAccount] -= nFee;
-        for (const PAIRTYPE(CTxDestination, int64_t)& s : listSent)
+        for (const std::pair<CTxDestination, int64_t>& s : listSent)
             mapAccountBalances[strSentAccount] -= s.second;
         if (nDepth >= nMinDepth)
         {
-            for (const PAIRTYPE(CTxDestination, int64_t)& r : listReceived)
+            for (const std::pair<CTxDestination, int64_t>& r : listReceived)
                 if (pwalletMain->mapAddressBook.count(r.first))
                     mapAccountBalances[pwalletMain->mapAddressBook[r.first].name] += r.second;
                 else
@@ -1324,7 +1324,7 @@ Value listaccounts(const Array& params, bool fHelp)
         mapAccountBalances[entry.strAccount] += entry.nCreditDebit;
 
     Object ret;
-    for (const PAIRTYPE(string, int64_t)& accountBalance : mapAccountBalances) {
+    for (const std::pair<string, int64_t>& accountBalance : mapAccountBalances) {
         ret.push_back(Pair(accountBalance.first, ValueFromAmount(accountBalance.second)));
     }
     return ret;
@@ -1366,7 +1366,7 @@ Value listsinceblock(const Array& params, bool fHelp)
             + HelpExampleRpc("listsinceblock", "\"000000000000000bacf66f7497b7dc45ef753ee9a7d38571037cdb1a57f663ad\", 6")
         );
 
-    CBlockIndex *pindex = NULL;
+    CBlockIndex *pindex = nullptr;
     int target_confirms = 1;
 
     if (params.size() > 0)

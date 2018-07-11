@@ -25,9 +25,9 @@ double GetDifficulty(const CBlockIndex* blockindex)
 {
     // Floating point number that is a multiple of the minimum difficulty,
     // minimum difficulty = 1.0.
-    if (blockindex == NULL)
+    if (blockindex == nullptr)
     {
-        if (chainActive.Tip() == NULL)
+        if (chainActive.Tip() == nullptr)
             return 1.0;
         else
             blockindex = chainActive.Tip();
@@ -163,7 +163,7 @@ Value getrawmempool(const Array& params, bool fHelp)
     {
         LOCK(mempool.cs);
         Object o;
-        for (const PAIRTYPE(uint256, CTxMemPoolEntry)& entry : mempool.mapTx)
+        for (const std::pair<uint256, CTxMemPoolEntry>& entry : mempool.mapTx)
         {
             const uint256& hash = entry.first;
             const CTxMemPoolEntry& e = entry.second;

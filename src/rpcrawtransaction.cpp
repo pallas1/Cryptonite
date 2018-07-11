@@ -415,7 +415,7 @@ Value listbalances(const Array& params, bool fHelp)
 
     Array results;
     vector<COutput> vecOutputs;
-    assert(pwalletMain != NULL);
+    assert(pwalletMain != nullptr);
 
     for(i=0; i < (int)vecAddress.size(); i++){
 
@@ -944,8 +944,8 @@ Value sendrawtransaction(const Array& params, bool fHelp)
     if (!fHave) {
         // push to local node and sync with wallets
         CValidationState state;
-        if (AcceptToMemoryPool(mempool, state, tx, false, NULL, !fOverrideFees))
-            SyncWithWallets(txID, tx, NULL);
+        if (AcceptToMemoryPool(mempool, state, tx, false, nullptr, !fOverrideFees))
+            SyncWithWallets(txID, tx, nullptr);
         else {
             if(state.IsInvalid())
                 throw JSONRPCError(RPC_TRANSACTION_REJECTED, strprintf("%i: %s", state.GetRejectCode(), state.GetRejectReason()));

@@ -259,7 +259,7 @@ void BitcoinCore::initialize()
     } catch (std::exception& e) {
         handleRunawayException(&e);
     } catch (...) {
-        handleRunawayException(NULL);
+        handleRunawayException(nullptr);
     }
 }
 
@@ -276,7 +276,7 @@ void BitcoinCore::shutdown()
     } catch (std::exception& e) {
         handleRunawayException(&e);
     } catch (...) {
-        handleRunawayException(NULL);
+        handleRunawayException(nullptr);
     }
 }
 
@@ -516,7 +516,7 @@ int main(int argc, char *argv[])
     // but before showing splash screen.
     if (mapArgs.count("-?") || mapArgs.count("--help"))
     {
-        HelpMessageDialog help(NULL);
+        HelpMessageDialog help(nullptr);
         help.showOrPrint();
         return 1;
     }
@@ -610,7 +610,7 @@ int main(int argc, char *argv[])
         PrintExceptionContinue(&e, "Runaway exception");
         app.handleRunawayException(QString::fromStdString(strMiscWarning));
     } catch (...) {
-        PrintExceptionContinue(NULL, "Runaway exception");
+        PrintExceptionContinue(nullptr, "Runaway exception");
         app.handleRunawayException(QString::fromStdString(strMiscWarning));
     }
     return app.getReturnValue();

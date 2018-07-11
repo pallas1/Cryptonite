@@ -22,22 +22,22 @@ namespace {
 int EC_KEY_regenerate_key(EC_KEY *eckey, BIGNUM *priv_key)
 {
     int ok = 0;
-    BN_CTX *ctx = NULL;
-    EC_POINT *pub_key = NULL;
+    BN_CTX *ctx = nullptr;
+    EC_POINT *pub_key = nullptr;
 
     if (!eckey) return 0;
 
     const EC_GROUP *group = EC_KEY_get0_group(eckey);
 
-    if ((ctx = BN_CTX_new()) == NULL)
+    if ((ctx = BN_CTX_new()) == nullptr)
         goto err;
 
     pub_key = EC_POINT_new(group);
 
-    if (pub_key == NULL)
+    if (pub_key == nullptr)
         goto err;
 
-    if (!EC_POINT_mul(group, pub_key, priv_key, NULL, NULL, ctx))
+    if (!EC_POINT_mul(group, pub_key, priv_key, nullptr, nullptr, ctx))
         goto err;
 
     EC_KEY_set_private_key(eckey,priv_key);
@@ -49,7 +49,7 @@ err:
 
     if (pub_key)
         EC_POINT_free(pub_key);
-    if (ctx != NULL)
+    if (ctx != nullptr)
         BN_CTX_free(ctx);
 
     return(ok);
@@ -73,24 +73,24 @@ int ECDSA_SIG_recover_key_GFp(EC_KEY *eckey, ECDSA_SIG *ecsig, const unsigned ch
     #endif
 
     int ret = 0;
-    BN_CTX *ctx = NULL;
+    BN_CTX *ctx = nullptr;
 
-    BIGNUM *x = NULL;
-    BIGNUM *e = NULL;
-    BIGNUM *order = NULL;
-    BIGNUM *sor = NULL;
-    BIGNUM *eor = NULL;
-    BIGNUM *field = NULL;
-    EC_POINT *R = NULL;
-    EC_POINT *O = NULL;
-    EC_POINT *Q = NULL;
-    BIGNUM *rr = NULL;
-    BIGNUM *zero = NULL;
+    BIGNUM *x = nullptr;
+    BIGNUM *e = nullptr;
+    BIGNUM *order = nullptr;
+    BIGNUM *sor = nullptr;
+    BIGNUM *eor = nullptr;
+    BIGNUM *field = nullptr;
+    EC_POINT *R = nullptr;
+    EC_POINT *O = nullptr;
+    EC_POINT *Q = nullptr;
+    BIGNUM *rr = nullptr;
+    BIGNUM *zero = nullptr;
     int n = 0;
     int i = recid / 2;
 
     const EC_GROUP *group = EC_KEY_get0_group(eckey);
-    if ((ctx = BN_CTX_new()) == NULL) { ret = -1; goto err; }
+    if ((ctx = BN_CTX_new()) == nullptr) { ret = -1; goto err; }
     BN_CTX_start(ctx);
     order = BN_CTX_get(ctx);
     if (!EC_GROUP_get_order(group, order, ctx)) { ret = -2; goto err; }
@@ -99,17 +99,17 @@ int ECDSA_SIG_recover_key_GFp(EC_KEY *eckey, ECDSA_SIG *ecsig, const unsigned ch
     if (!BN_mul_word(x, i)) { ret=-1; goto err; }
     if (!BN_add(x, x, sig_r)) { ret=-1; goto err; }
     field = BN_CTX_get(ctx);
-    if (!EC_GROUP_get_curve_GFp(group, field, NULL, NULL, ctx)) { ret=-2; goto err; }
+    if (!EC_GROUP_get_curve_GFp(group, field, nullptr, nullptr, ctx)) { ret=-2; goto err; }
     if (BN_cmp(x, field) >= 0) { ret=0; goto err; }
-    if ((R = EC_POINT_new(group)) == NULL) { ret = -2; goto err; }
+    if ((R = EC_POINT_new(group)) == nullptr) { ret = -2; goto err; }
     if (!EC_POINT_set_compressed_coordinates_GFp(group, R, x, recid % 2, ctx)) { ret=0; goto err; }
     if (check)
     {
-        if ((O = EC_POINT_new(group)) == NULL) { ret = -2; goto err; }
-        if (!EC_POINT_mul(group, O, NULL, R, order, ctx)) { ret=-2; goto err; }
+        if ((O = EC_POINT_new(group)) == nullptr) { ret = -2; goto err; }
+        if (!EC_POINT_mul(group, O, nullptr, R, order, ctx)) { ret=-2; goto err; }
         if (!EC_POINT_is_at_infinity(group, O)) { ret = 0; goto err; }
     }
-    if ((Q = EC_POINT_new(group)) == NULL) { ret = -2; goto err; }
+    if ((Q = EC_POINT_new(group)) == nullptr) { ret = -2; goto err; }
     n = EC_GROUP_get_degree(group);
     e = BN_CTX_get(ctx);
     if (!BN_bin2bn(msg, msglen, e)) { ret=-1; goto err; }
@@ -133,9 +133,9 @@ err:
         BN_CTX_end(ctx);
         BN_CTX_free(ctx);
     }
-    if (R != NULL) EC_POINT_free(R);
-    if (O != NULL) EC_POINT_free(O);
-    if (Q != NULL) EC_POINT_free(Q);
+    if (R != nullptr) EC_POINT_free(R);
+    if (O != nullptr) EC_POINT_free(O);
+    if (Q != nullptr) EC_POINT_free(Q);
     return ret;
 }
 
@@ -147,7 +147,7 @@ private:
 public:
     CECKey() {
         pkey = EC_KEY_new_by_curve_name(NID_secp256k1);
-        assert(pkey != NULL);
+        assert(pkey != nullptr);
     }
 
     ~CECKey() {
@@ -178,7 +178,7 @@ public:
 
     void GetPrivKey(CPrivKey &privkey, bool fCompressed) {
         EC_KEY_set_conv_form(pkey, fCompressed ? POINT_CONVERSION_COMPRESSED : POINT_CONVERSION_UNCOMPRESSED);
-        int nSize = i2d_ECPrivateKey(pkey, NULL);
+        int nSize = i2d_ECPrivateKey(pkey, nullptr);
         assert(nSize);
         privkey.resize(nSize);
         unsigned char* pbegin = &privkey[0];
@@ -202,7 +202,7 @@ public:
 
     void GetPubKey(CPubKey &pubkey, bool fCompressed) {
         EC_KEY_set_conv_form(pkey, fCompressed ? POINT_CONVERSION_COMPRESSED : POINT_CONVERSION_UNCOMPRESSED);
-        int nSize = i2o_ECPublicKey(pkey, NULL);
+        int nSize = i2o_ECPublicKey(pkey, nullptr);
         assert(nSize);
         assert(nSize <= 65);
         unsigned char c[65];
@@ -233,7 +233,7 @@ public:
         #endif
 
 
-        if (sig == NULL)
+        if (sig == nullptr)
             return false;
         BN_CTX *ctx = BN_CTX_new();
         BN_CTX_start(ctx);
@@ -269,7 +269,7 @@ public:
     bool SignCompact(const uint256 &hash, unsigned char *p64, int &rec) {
         bool fOk = false;
         ECDSA_SIG *sig = ECDSA_do_sign((unsigned char*)&hash, sizeof(hash), pkey);
-        if (sig==NULL)
+        if (sig==nullptr)
             return false;
         memset(p64, 0, 64);
 
