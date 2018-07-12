@@ -25,6 +25,7 @@ DIST_SUBDIRS = . qt test
 .PHONY: FORCE
 # bitcoin core #
 BITCOIN_CORE_H = \
+  addrdb.h \
   addrman.h \
   alert.h \
   allocators.h \
@@ -93,6 +94,7 @@ obj/build.h: FORCE
 version.o: obj/build.h
 
 libcryptonite_server_a_SOURCES = \
+  addrdb.cpp \
   addrman.cpp \
   alert.cpp \
   bloom.cpp \
