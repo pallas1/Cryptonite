@@ -339,6 +339,7 @@ std::string HelpMessage(HelpMessageMode hmm)
     strUsage += "  -rpcallowip=<ip>       " + _("Allow JSON-RPC connections from specified IP address") + "\n";
     strUsage += "  -rpcthreads=<n>        " + _("Set the number of threads to service RPC calls (default: 4)") + "\n";
     strUsage += "  -epamounts=<n>         " + _("Use Extended Precision amounts in RPC calls (default: 1, 0 to disable)") + "\n";
+    strUsage += "  -stringamounts=<n>     " + _("Use string type amounts in RPC calls (default: 1, 0 to disable); epamounts = 1 forces this to 1") + "\n";
 
     strUsage += "\n" + _("RPC SSL options: (see the Cryptonite Wiki for SSL setup instructions)") + "\n";
     strUsage += "  -rpcssl                                  " + _("Use OpenSSL (https) for JSON-RPC connections") + "\n";
@@ -553,6 +554,10 @@ bool AppInit2(boost::thread_group& threadGroup)
     fEPAmounts = (GetArg("-epamounts", 1) == 1);
     if (fEPAmounts) LogPrintf("Using Extented Precision amounts\n");
     else LogPrintf("Using Standard Precision amounts\n");
+
+    fStringAmounts = (GetArg("-stringamounts", 1) == 1);
+    if (fStringAmounts) LogPrintf("Using String RPC amounts\n");
+    else LogPrintf("Using Numeric RPC amounts\n");
 
     fDebug = !mapMultiArgs["-debug"].empty();
     // Special-case: if -debug=0/-nodebug is set, turn off debugging messages
