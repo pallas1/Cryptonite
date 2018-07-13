@@ -119,6 +119,7 @@ extern bool fNoListen;
 extern bool fLogTimestamps;
 extern volatile bool fReopenDebugLog;
 extern bool fEPAmounts;
+extern bool fStringAmounts;
 
 void RandAddSeed();
 void RandAddSeedPerfmon();
