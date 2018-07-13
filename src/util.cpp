@@ -97,6 +97,7 @@ bool fLogTimestamps = false;
 volatile bool fReopenDebugLog = false;
 CClientUIInterface uiInterface;
 bool fEPAmounts = true;
+bool fStringAmounts = true;
 
 // Init OpenSSL library multithreading support
 static CCriticalSection** ppmutexOpenSSL;
