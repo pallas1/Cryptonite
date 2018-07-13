@@ -83,7 +83,7 @@ void RPCTypeCheck(const Object& o,
 
 uint64_t AmountFromValue(const Value& value)
 {
-	if (value.type() != str_type)
+	if (value.type() != str_type and (fStringAmounts or fEPAmounts))
 		throw JSONRPCError(RPC_TYPE_ERROR, "Invalid amount, not string");
 
 	const char *str = value.get_str().c_str();
@@ -156,7 +156,8 @@ Value ValueFromAmount(uint64_t v)
 	}
     buf[idx++] = 0;
 //		snprintf(buf, 63, "%lu", v);
-  return string(buf);
+	if (fStringAmounts or fEPAmounts) return string(buf);
+	else return atof(buf);
 }
 
 std::string HexBits(unsigned int nBits)
