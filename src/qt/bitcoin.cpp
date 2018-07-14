@@ -23,6 +23,7 @@
 #include "init.h"
 #include "main.h"
 #include "rpcserver.h"
+#include "scheduler.h"
 #include "ui_interface.h"
 #include "util.h"
 #ifdef ENABLE_WALLET
@@ -168,6 +169,7 @@ Q_SIGNALS:
 
 private:
     boost::thread_group threadGroup;
+    CScheduler scheduler;
 
     /// Pass fatal exception message to UI thread
     void handleRunawayException(std::exception *e);
@@ -245,7 +247,7 @@ void BitcoinCore::initialize()
     try
     {
         qDebug() << __func__ << ": Running AppInit2 in thread";
-        int rv = AppInit2(threadGroup);
+        int rv = AppInit2(threadGroup, scheduler);
         if(rv)
         {
             /* Start a dummy RPC thread if no RPC thread is active yet
@@ -257,7 +259,7 @@ void BitcoinCore::initialize()
     } catch (std::exception& e) {
         handleRunawayException(&e);
     } catch (...) {
-        handleRunawayException(NULL);
+        handleRunawayException(nullptr);
     }
 }
 
@@ -274,7 +276,7 @@ void BitcoinCore::shutdown()
     } catch (std::exception& e) {
         handleRunawayException(&e);
     } catch (...) {
-        handleRunawayException(NULL);
+        handleRunawayException(nullptr);
     }
 }
 
@@ -514,7 +516,7 @@ int main(int argc, char *argv[])
     // but before showing splash screen.
     if (mapArgs.count("-?") || mapArgs.count("--help"))
     {
-        HelpMessageDialog help(NULL);
+        HelpMessageDialog help(nullptr);
         help.showOrPrint();
         return 1;
     }
@@ -608,7 +610,7 @@ int main(int argc, char *argv[])
         PrintExceptionContinue(&e, "Runaway exception");
         app.handleRunawayException(QString::fromStdString(strMiscWarning));
     } catch (...) {
-        PrintExceptionContinue(NULL, "Runaway exception");
+        PrintExceptionContinue(nullptr, "Runaway exception");
         app.handleRunawayException(QString::fromStdString(strMiscWarning));
     }
     return app.getReturnValue();

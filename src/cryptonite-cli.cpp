@@ -67,7 +67,7 @@ int main(int argc, char* argv[])
         PrintExceptionContinue(&e, "AppInitRPC()");
         return abs(RPC_MISC_ERROR);
     } catch (...) {
-        PrintExceptionContinue(NULL, "AppInitRPC()");
+        PrintExceptionContinue(nullptr, "AppInitRPC()");
         return abs(RPC_MISC_ERROR);
     }
 
@@ -79,7 +79,7 @@ int main(int argc, char* argv[])
     catch (std::exception& e) {
         PrintExceptionContinue(&e, "CommandLineRPC()");
     } catch (...) {
-        PrintExceptionContinue(NULL, "CommandLineRPC()");
+        PrintExceptionContinue(nullptr, "CommandLineRPC()");
     }
     return ret;
 }

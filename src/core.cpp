@@ -84,7 +84,7 @@ bool CTransaction::IsNewerThan(const CTransaction& old) const
 uint64_t CTransaction::GetValueOut() const
 {
     uint64_t nValueOut = 0;
-    BOOST_FOREACH(const CTxOut& txout, vout)
+    for (const CTxOut& txout : vout)
     {
         if (!MoneyRange(txout.nValue + nValueOut) || (nValueOut + txout.nValue < nValueOut))
             throw std::runtime_error("CTransaction::GetValueOut() : value out of range");
@@ -96,7 +96,7 @@ uint64_t CTransaction::GetValueOut() const
 uint64_t CTransaction::GetValueIn() const
 {
     uint64_t nValueIn = 0;
-    BOOST_FOREACH(const CTxIn& txin, vin)
+    for (const CTxIn& txin : vin)
     {
         if (!MoneyRange(txin.nValue + nValueIn) || (nValueIn + txin.nValue < nValueIn))
             throw std::runtime_error("CTransaction::GetValueIn() : value out of range");
@@ -114,7 +114,7 @@ double CTransaction::ComputePriority(double dPriorityInputs, unsigned int nTxSiz
     // risk encouraging people to create junk outputs to redeem later.
     if (nTxSize == 0)
         nTxSize = ::GetSerializeSize(*this, SER_NETWORK, PROTOCOL_VERSION);
-    BOOST_FOREACH(const CTxIn& txin, vin)
+    for (const CTxIn& txin : vin)
     {
         unsigned int offset = 41U + std::min(110U, (unsigned int)txin.scriptSig.size());
         if (nTxSize > offset)
@@ -214,7 +214,7 @@ uint256 CBlockHeader::GetHash() const
 uint256 CBlock::BuildMerkleTree() const
 {
     vMerkleTree.clear();
-    BOOST_FOREACH(const CTransaction& tx, vtx)
+    for (const CTransaction& tx : vtx)
         vMerkleTree.push_back(tx.GetHash());
     int j = 0;
     for (int nSize = vtx.size(); nSize > 1; nSize = (nSize + 1) / 2)
@@ -250,7 +250,7 @@ uint256 CBlock::CheckMerkleBranch(uint256 hash, const std::vector<uint256>& vMer
 {
     if (nIndex == -1)
         return 0;
-    BOOST_FOREACH(const uint256& otherside, vMerkleBranch)
+    for (const uint256& otherside : vMerkleBranch)
     {
         if (nIndex & 1)
             hash = Hash(BEGIN(otherside), END(otherside), BEGIN(hash), END(hash));

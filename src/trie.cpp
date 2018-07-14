@@ -248,7 +248,7 @@ void TrieNode::Replace(TrieNode* where, TrieNode* what){
 }
 
 uint32_t TrieNode::GetTotalBits(){
-	return m_key_bits + 1 + ((m_parent!=NULL)?m_parent->GetTotalBits():0);
+	return m_key_bits + 1 + ((m_parent!=nullptr)?m_parent->GetTotalBits():0);
 }
 
 uint256_t TrieNode::Hash(){

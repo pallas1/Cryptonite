@@ -6,12 +6,12 @@
 #include "checkpoints.h"
 
 #include "main.h"
+#include "reverse_iterator.h"
 #include "uint256.h"
 
 #include <stdint.h>
 
 #include <boost/assign/list_of.hpp> // for 'map_list_of()'
-#include <boost/foreach.hpp>
 
 namespace Checkpoints
 {
@@ -84,10 +84,10 @@ namespace Checkpoints
 
     // Guess how far we are in the verification process at the given block index
     double GuessVerificationProgress(CBlockIndex *pindex, bool fSigchecks) {
-        if (pindex==NULL)
+        if (pindex==nullptr)
             return 0.0;
 
-        int64_t nNow = time(NULL);
+        int64_t nNow = time(nullptr);
 
         double fSigcheckVerificationFactor = fSigchecks ? SIGCHECK_VERIFICATION_FACTOR : 1.0;
         double fWorkBefore = 0.0; // Amount of work done before pindex
@@ -127,18 +127,18 @@ namespace Checkpoints
     CBlockIndex* GetLastCheckpoint(const std::map<uint256, CBlockIndex*>& mapBlockIndex)
     {
         if (!fEnabled)
-            return NULL;
+            return nullptr;
 
         const MapCheckpoints& checkpoints = *Checkpoints().mapCheckpoints;
 
-        BOOST_REVERSE_FOREACH(const MapCheckpoints::value_type& i, checkpoints)
+        for (const MapCheckpoints::value_type& i : reverse_iterate(checkpoints))
         {
             const uint256& hash = i.second;
             std::map<uint256, CBlockIndex*>::const_iterator t = mapBlockIndex.find(hash);
             if (t != mapBlockIndex.end())
                 return t->second;
         }
-        return NULL;
+        return nullptr;
     }
 
     int GetLastCheckpointHeight(int nHeight)

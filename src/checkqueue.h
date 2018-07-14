@@ -8,7 +8,6 @@
 #include <algorithm>
 #include <vector>
 
-#include <boost/foreach.hpp>
 #include <boost/thread/condition_variable.hpp>
 #include <boost/thread/locks.hpp>
 #include <boost/thread/mutex.hpp>
@@ -112,7 +111,7 @@ private:
                 fOk = fAllOk;
             }
             // execute work
-            BOOST_FOREACH(T &check, vChecks)
+            for (T &check : vChecks)
                 if (fOk)
                     fOk = check();
             vChecks.clear();
@@ -137,7 +136,7 @@ public:
     // Add a batch of checks to the queue
     void Add(std::vector<T> &vChecks) {
         boost::unique_lock<boost::mutex> lock(mutex);
-        BOOST_FOREACH(T &check, vChecks) {
+        for (T &check : vChecks) {
             queue.push_back(T());
             check.swap(queue.back());
         }
@@ -164,8 +163,8 @@ private:
 
 public:
     CCheckQueueControl(CCheckQueue<T> *pqueueIn) : pqueue(pqueueIn), fDone(false) {
-        // passed queue is supposed to be unused, or NULL
-        if (pqueue != NULL) {
+        // passed queue is supposed to be unused, or nullptr
+        if (pqueue != nullptr) {
             assert(pqueue->nTotal == pqueue->nIdle);
             assert(pqueue->nTodo == 0);
             assert(pqueue->fAllOk == true);
@@ -173,7 +172,7 @@ public:
     }
 
     bool Wait() {
-        if (pqueue == NULL)
+        if (pqueue == nullptr)
             return true;
         bool fRet = pqueue->Wait();
         fDone = true;
@@ -181,7 +180,7 @@ public:
     }
 
     void Add(std::vector<T> &vChecks) {
-        if (pqueue != NULL)
+        if (pqueue != nullptr)
             pqueue->Add(vChecks);
     }
 

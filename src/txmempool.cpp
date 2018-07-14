@@ -6,6 +6,7 @@
 
 #include "main.h"
 #include "core.h"
+#include "reverse_iterator.h"
 #include "txmempool.h"
 
 using namespace std;
@@ -92,9 +93,9 @@ void CTxMemPool::remove(const CTransaction &tx)
     // also multiple transactions may use an account for input/output
     LOCK(cs);
     {
-        BOOST_FOREACH(const CTxIn& txin, tx.vin)
+        for (const CTxIn& txin : tx.vin)
             mapAccount[txin.pubKey].erase(tx.GetTxID());
-        BOOST_FOREACH(const CTxOut& txout, tx.vout)
+        for (const CTxOut& txout : tx.vout)
             mapAccount[txout.pubKey].erase(tx.GetTxID());
         mapTx.erase(tx.GetTxID());
         nTransactionsUpdated++;
@@ -133,7 +134,7 @@ void CTxMemPool::validate(std::vector<CTransaction>& removed){
 	}
 
         bool fMissingInputs = false;
-        BOOST_FOREACH(const CTxIn& txin, tx.vin)
+        for (const CTxIn& txin : tx.vin)
         {
 	    //printf("Analyzing txin\n");
 	    if(mapBalances.find(txin.pubKey)!=mapBalances.end()){
@@ -162,7 +163,7 @@ void CTxMemPool::validate(std::vector<CTransaction>& removed){
         }
 
 	bool fMissingOutputs=false;
-	BOOST_FOREACH(const CTxOut& txout, tx.vout){
+	for (const CTxOut& txout : tx.vout){
 	    uint64_t balance=0;
 	    if(!pviewTip->Balance(txout.pubKey,balance)){
 		if(txout.nValue < tx.GetFee()){
@@ -176,7 +177,7 @@ void CTxMemPool::validate(std::vector<CTransaction>& removed){
 	    removed.push_back(tx);
 	}
     }
-    BOOST_FOREACH(CTransaction tx, removed){
+    for (CTransaction tx : removed){
 	remove(tx);
     }
 }
@@ -189,7 +190,7 @@ void CTxMemPool::removeConflicts(const CTransaction &tx, std::list<CTransaction>
 #if 0
     list<CTransaction> result;
     LOCK(cs);
-    BOOST_FOREACH(const CTxIn &txin, tx.vin) {
+    for (const CTxIn &txin : tx.vin) {
         std::map<COutPoint, CInPoint>::iterator it = mapNextTx.find(txin.prevout);
         if (it != mapNextTx.end()) {
             const CTransaction &txConflict = *it->second.ptx;

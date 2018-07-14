@@ -60,7 +60,7 @@ public:
 #if QT_VERSION >= 0x040700
             cachedNodeStats.reserve(vNodes.size());
 #endif
-            Q_FOREACH(CNode* pnode, vNodes)
+            for (CNode* pnode : vNodes)
             {
                 CNodeCombinedStats stats;
                 stats.statestats.nMisbehavior = -1;
@@ -74,7 +74,7 @@ public:
         {
             if (lockMain)
             {
-                BOOST_FOREACH(CNodeCombinedStats &stats, cachedNodeStats)
+                for (CNodeCombinedStats &stats : cachedNodeStats)
                 {
                     GetNodeStateStats(stats.nodestats.nodeid, stats.statestats);
                 }
@@ -89,7 +89,7 @@ public:
         // build index map
         mapNodeRows.clear();
         int row = 0;
-        Q_FOREACH (const CNodeCombinedStats& stats, cachedNodeStats)
+        for (const CNodeCombinedStats& stats : cachedNodeStats)
             mapNodeRows.insert(std::pair<NodeId, int>(stats.nodestats.nodeid, row++));
     }
 

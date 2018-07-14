@@ -8,6 +8,7 @@
 #include "core.h"
 #include "main.h"
 #include "net.h"
+#include "util.h"
 #ifdef ENABLE_WALLET
 #include "wallet.h"
 #endif
@@ -37,7 +38,7 @@ public:
     {
         LogPrintf("COrphan(hash=%s, dPriority=%.1f, dFeePerKb=%.1f)\n",
                ptx->GetHash().ToString(), dPriority, dFeePerKb);
-        BOOST_FOREACH(uint256 hash, setDependsOn)
+        for (uint256 hash : setDependsOn)
             LogPrintf("   setDependsOn %s\n", hash.ToString());
     }
 };
@@ -93,7 +94,7 @@ CBlockTemplate* CreateNewBlock(uint160 pubKey)
     // Create new block
     auto_ptr<CBlockTemplate> pblocktemplate(new CBlockTemplate());
     if(!pblocktemplate.get())
-        return NULL;
+        return nullptr;
     CBlock *pblock = &pblocktemplate->block; // pointer for convenience
 
     // Create coinbase tx
@@ -149,7 +150,7 @@ CBlockTemplate* CreateNewBlock(uint160 pubKey)
             double dPriority = 0;
             int64_t nTotalIn = 0;
             bool fMissingInputs = false;
-            BOOST_FOREACH(const CTxIn& txin, tx.vin)
+            for (const CTxIn& txin : tx.vin)
             {
 		//printf("Analyzing txin\n");
 		if(mapBalances.find(txin.pubKey)!=mapBalances.end()){
@@ -182,7 +183,7 @@ CBlockTemplate* CreateNewBlock(uint160 pubKey)
             if (fMissingInputs) continue;
 
 	    bool fCantCreate=false;
-	    BOOST_FOREACH(const CTxOut& txout, tx.vout){
+	    for (const CTxOut& txout : tx.vout){
 		uint64_t balance=0;
 		if(!pviewTip->Balance(txout.pubKey,balance) && txout.nValue < tx.GetFee()){
 		    fCantCreate=true;
@@ -250,7 +251,7 @@ CBlockTemplate* CreateNewBlock(uint160 pubKey)
 		//Limit transactions always valid now
 		setLimits.insert(tx.vin[0].pubKey);
 	    }else{
-	    	BOOST_FOREACH(const CTxIn& txin, tx.vin){
+	    	for (const CTxIn& txin : tx.vin){
 		     if(setLimits.count(txin.pubKey))
 			continue;
 	    	}
@@ -278,7 +279,7 @@ CBlockTemplate* CreateNewBlock(uint160 pubKey)
             if (!CheckInputs(tx, state))
                 continue;
 
-	    BOOST_FOREACH(const CTxIn& txin, tx.vin){
+	    for (const CTxIn& txin : tx.vin){
 		setTxOps.insert(txin.pubKey);
 	    }
 
@@ -547,7 +548,7 @@ void static BitcoinMiner(CWallet *pwallet)
 
 void GenerateBitcoins(bool fGenerate, CWallet* pwallet, int nThreads)
 {
-    static boost::thread_group* minerThreads = NULL;
+    static boost::thread_group* minerThreads = nullptr;
     fSoloMine = GetBoolArg("-solomine", false);
 
 
@@ -555,14 +556,14 @@ void GenerateBitcoins(bool fGenerate, CWallet* pwallet, int nThreads)
         if (Params().NetworkID() == CChainParams::REGTEST)
             nThreads = 1;
         else
-            nThreads = boost::thread::hardware_concurrency();
+            nThreads = GetNumCores();
     }
 
-    if (minerThreads != NULL)
+    if (minerThreads != nullptr)
     {
         minerThreads->interrupt_all();
         delete minerThreads;
-        minerThreads = NULL;
+        minerThreads = nullptr;
     }
 
     if (nThreads == 0 || !fGenerate)

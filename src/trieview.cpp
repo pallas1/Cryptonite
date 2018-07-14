@@ -188,7 +188,7 @@ bool TrieView::TempApply(CBlock block, list<CTxUndo> &undos){
     map<uint160,uint64_t> limits;
     set<uint160> setLimit, setTxIn;
 
-    BOOST_FOREACH(const CTransaction &tx, block.vtx){
+    for (const CTransaction &tx : block.vtx){
 	if(tx.IsCoinBase()){
 	    TrieNode* node = TrieEngine::Find(0, m_root);
 	    uint64_t coinb=0;
@@ -201,7 +201,7 @@ bool TrieView::TempApply(CBlock block, list<CTxUndo> &undos){
 	}
 
 
-	BOOST_FOREACH(const CTxIn& txin, tx.vin){
+	for (const CTxIn& txin : tx.vin){
 	    TrieNode* node = TrieEngine::Find(txin.pubKey, m_root);
 	    if(!node){
 		LogPrintf("Failed to find node for %s\n", txin.pubKey.GetHex().c_str());
@@ -275,7 +275,7 @@ bool TrieView::TempApply(CBlock block, list<CTxUndo> &undos){
 	    undos.push_back(undo);
 	}
 
-        BOOST_FOREACH(const CTxOut& txout, tx.vout){
+        for (const CTxOut& txout : tx.vout){
 	    TrieNode* node = TrieEngine::Find(txout.pubKey, m_root);
 	    if(node){
 		CTxUndo undo(node->Key());

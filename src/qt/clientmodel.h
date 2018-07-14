@@ -74,10 +74,10 @@ public:
     QString getStatusBarWarnings() const;
 
     QString formatFullVersion() const;
-    QString formatBuildDate() const;
     bool isReleaseVersion() const;
     QString clientName() const;
     QString formatClientStartupTime() const;
+    QString dataDir() const;
 
     int nProgress;
 

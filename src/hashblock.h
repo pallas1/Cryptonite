@@ -132,7 +132,7 @@ inline uint256 Hash7(const T1 pbegin, const T1 pend)
 
     int bytes = mpz_sizeinbase(product, 256);
     char *data = (char*)malloc(bytes);
-    mpz_export(data, NULL, -1, 1, 0, 0, product);
+    mpz_export(data, nullptr, -1, 1, 0, 0, product);
 
     //Free the memory
     for(int i=0; i < 7; i++){

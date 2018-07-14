@@ -83,7 +83,7 @@ unsigned mdb_midl_search( MDB_IDL ids, MDB_ID id );
 
 	/** Allocate an IDL.
 	 * Allocates memory for an IDL of the given size.
-	 * @return	IDL on success, NULL on failure.
+	 * @return	IDL on success, nullptr on failure.
 	 */
 MDB_IDL mdb_midl_alloc(int num);
 

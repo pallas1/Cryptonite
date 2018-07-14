@@ -52,13 +52,13 @@ const char* BITCOIN_REQUEST_MIMETYPE = "application/cryptonite-paymentrequest";
 const char* BITCOIN_PAYMENTACK_MIMETYPE = "application/cryptonite-paymentack";
 const char* BITCOIN_PAYMENTACK_CONTENTTYPE = "application/cryptonite-payment";
 
-X509_STORE* PaymentServer::certStore = NULL;
+X509_STORE* PaymentServer::certStore = nullptr;
 void PaymentServer::freeCertStore()
 {
-    if (PaymentServer::certStore != NULL)
+    if (PaymentServer::certStore != nullptr)
     {
         X509_STORE_free(PaymentServer::certStore);
-        PaymentServer::certStore = NULL;
+        PaymentServer::certStore = nullptr;
     }
 }
 
@@ -97,7 +97,7 @@ static void ReportInvalidCertificate(const QSslCertificate& cert)
 //
 void PaymentServer::LoadRootCAs(X509_STORE* _store)
 {
-    if (PaymentServer::certStore == NULL)
+    if (PaymentServer::certStore == nullptr)
         atexit(PaymentServer::freeCertStore);
     else
         freeCertStore();
@@ -132,7 +132,7 @@ void PaymentServer::LoadRootCAs(X509_STORE* _store)
 
     int nRootCerts = 0;
     const QDateTime currentTime = QDateTime::currentDateTime();
-    Q_FOREACH (const QSslCertificate& cert, certList)
+    for (const QSslCertificate& cert : certList)
     {
         if (currentTime < cert.effectiveDate() || currentTime > cert.expiryDate()) {
             ReportInvalidCertificate(cert);
@@ -234,7 +234,7 @@ bool PaymentServer::ipcParseCommandLine(int argc, char* argv[])
 bool PaymentServer::ipcSendCommandLine()
 {
     bool fResult = false;
-    Q_FOREACH (const QString& r, savedPaymentRequests)
+    for (const QString& r : savedPaymentRequests)
     {
         QLocalSocket* socket = new QLocalSocket();
         socket->connectToServer(ipcServerName(), QIODevice::WriteOnly);
@@ -329,7 +329,7 @@ void PaymentServer::initNetManager()
 {
     if (!optionsModel)
         return;
-    if (netManager != NULL)
+    if (netManager != nullptr)
         delete netManager;
 
     // netManager is used to fetch paymentrequests given in bitcoin: URIs
@@ -363,7 +363,7 @@ void PaymentServer::uiReady()
     initNetManager();
 
     saveURIs = false;
-    Q_FOREACH (const QString& s, savedPaymentRequests)
+    for (const QString& s : savedPaymentRequests)
     {
         handleURIOrFile(s);
     }
@@ -489,7 +489,7 @@ bool PaymentServer::processPaymentRequest(PaymentRequestPlus& request, SendCoins
     QList<std::pair<uint160, qint64> > sendingTos = request.getPayTo();
     QStringList addresses;
 
-    Q_FOREACH (const PAIRTYPE(uint160, qint64)& sendingTo, sendingTos) {
+    for (const std::pair<uint160, qint64>& sendingTo : sendingTos) {
         // Extract and check destination addresses
         CTxDestination dest(CKeyID(sendingTo.first));
         // Append destination address
@@ -643,7 +643,7 @@ void PaymentServer::reportSslErrors(QNetworkReply* reply, const QList<QSslError>
     Q_UNUSED(reply);
 
     QString errString;
-    Q_FOREACH (const QSslError& err, errs) {
+    for (const QSslError& err : errs) {
         qDebug() << "PaymentServer::reportSslErrors : " << err;
         errString += err.errorString() + "\n";
     }

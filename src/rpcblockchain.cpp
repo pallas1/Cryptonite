@@ -25,9 +25,9 @@ double GetDifficulty(const CBlockIndex* blockindex)
 {
     // Floating point number that is a multiple of the minimum difficulty,
     // minimum difficulty = 1.0.
-    if (blockindex == NULL)
+    if (blockindex == nullptr)
     {
-        if (chainActive.Tip() == NULL)
+        if (chainActive.Tip() == nullptr)
             return 1.0;
         else
             blockindex = chainActive.Tip();
@@ -68,7 +68,7 @@ Object blockToJSON(const CBlock& block, const CBlockIndex* blockindex)
 
     result.push_back(Pair("size", (int)::GetSerializeSize(block, SER_NETWORK, PROTOCOL_VERSION)));
     Array txs;
-    BOOST_FOREACH(const CTransaction&tx, block.vtx)
+    for (const CTransaction&tx : block.vtx)
         txs.push_back(tx.GetTxID().GetHex());
     result.push_back(Pair("tx", txs));
     return result;
@@ -163,7 +163,7 @@ Value getrawmempool(const Array& params, bool fHelp)
     {
         LOCK(mempool.cs);
         Object o;
-        BOOST_FOREACH(const PAIRTYPE(uint256, CTxMemPoolEntry)& entry, mempool.mapTx)
+        for (const std::pair<uint256, CTxMemPoolEntry>& entry : mempool.mapTx)
         {
             const uint256& hash = entry.first;
             const CTxMemPoolEntry& e = entry.second;
@@ -177,11 +177,11 @@ Value getrawmempool(const Array& params, bool fHelp)
 
             const CTransaction& tx = e.GetTx();
             set<string> setDepends;
-            BOOST_FOREACH(const CTxIn& txin, tx.vin)
+            for (const CTxIn& txin : tx.vin)
             {
 		vector<CTransaction> results;
                 mempool.lookup(txin.pubKey,results);
-		BOOST_FOREACH(CTransaction tx, results){
+		for (CTransaction tx : results){
                     setDepends.insert(tx.GetTxID().ToString());
 		}
             }
@@ -198,7 +198,7 @@ Value getrawmempool(const Array& params, bool fHelp)
         mempool.queryHashes(vtxid);
 
         Array a;
-        BOOST_FOREACH(const uint256& hash, vtxid)
+        for (const uint256& hash : vtxid)
             a.push_back(hash.ToString());
 
         return a;

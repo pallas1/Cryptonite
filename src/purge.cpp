@@ -58,7 +58,7 @@ void PurgeDB(){
     //block and undo files to undeletable
 
     //mapBlockIndex contains all blocks, so we can read those for info
-    BOOST_FOREACH(PAIRTYPE(uint256, CBlockIndex*) item, mapBlockIndex){
+    for (std::pair<uint256, CBlockIndex*> item : mapBlockIndex){
 	CBlockIndex *pindex = item.second;	
 	if(pindex->nHeight + MIN_HISTORY >= chainActive.Height()){
 	    //Block cannot be deleted
@@ -68,7 +68,7 @@ void PurgeDB(){
     }
 
     //Second pass, locate all blocks that can have transactions deleted from txindex
-    BOOST_FOREACH(PAIRTYPE(uint256, CBlockIndex*) item, mapBlockIndex){
+    for (std::pair<uint256, CBlockIndex*> item : mapBlockIndex){
 	CBlockIndex *pindex = item.second;	
 	if(pindex->nHeight + MIN_HISTORY < chainActive.Height()){
 	    //Block can be deleted
@@ -80,10 +80,10 @@ void PurgeDB(){
     }
 
     //Third pass, delete tx's from txindex
-    BOOST_FOREACH(CBlockIndex* pindex, setDelete){
+    for (CBlockIndex* pindex : setDelete){
 	CBlock block;
 	blockCache.ReadBlockFromDisk(block, pindex);
-	BOOST_FOREACH(CTransaction tx, block.vtx){
+	for (CTransaction tx : block.vtx){
 	     pblocktree->EraseTxIndex(tx.GetTxID());
 	}
 	pindex->nStatus &= ~(BLOCK_HAVE_DATA | BLOCK_HAVE_UNDO);
